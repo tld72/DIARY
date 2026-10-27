@@ -172,7 +172,7 @@
         
         let currentActiveDate = null;
         let selectedMood = null;
-        let pendingAction = null; // 'edit' hoặc 'delete'
+        let pendingAction = null; 
         let pendingDate = null;
 
         function handleUnlock() {
@@ -282,7 +282,6 @@
             requestEdit(currentActiveDate);
         }
 
-        // Xử lý bảo mật trước khi Sửa hoặc Xóa
         function requestEdit(date) {
             pendingAction = 'edit';
             pendingDate = date;
@@ -319,13 +318,23 @@
                 return;
             }
 
+            if (!savedPass) {
+                localStorage.setItem('diary_password', enteredPass);
+                savedPass = enteredPass;
+            }
+
             if (enteredPass === savedPass) {
+                // Lưu lại hành động trước khi đóng modal
+                let action = pendingAction;
+                let dateToProcess = pendingDate;
+                
                 closeAuthModal();
-                if (pendingAction === 'edit') {
+
+                if (action === 'edit') {
                     viewScreen.classList.add('hidden');
-                    openEdit(pendingDate);
-                } else if (pendingAction === 'delete') {
-                    executeDelete(pendingDate);
+                    openEdit(dateToProcess);
+                } else if (action === 'delete') {
+                    executeDelete(dateToProcess);
                 }
             } else {
                 statusEl.innerText = 'Mật khẩu không đúng!';
@@ -428,7 +437,7 @@
             }
             if (!newPass) {
                 statusText.className = "text-center text-xs font-medium text-red-500 h-4";
-                statusText.innerText = 'Vui lòng nhập mật khẩu mới!';
+                statusText.innerText = 'Vui lòng nhập đúng mật khẩu mới!';
                 return;
             }
             localStorage.setItem('diary_password', newPass);
