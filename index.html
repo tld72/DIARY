@@ -4,13 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DIARY</title>
-
     <!-- 1. ICON TRÊN TAB TRÌNH DUYỆT WEB -->
     <link rel="icon" type="image/png" href="https://cdn.phototourl.com/free/2026-08-19-45c424ce-b3c7-4e99-be56-8fbfba990fa7.png">
-
     <!-- 2. ICON KHI THÊM VÀO MÀN HÌNH CHÍNH IOS (IPHONE/IPAD) -->
     <link rel="apple-touch-icon" href="https://cdn.phototourl.com/free/2026-08-19-b22a9305-4f98-4ff6-8eac-6504bd98b7e0.png">
-
     <!-- 3. CẤU HÌNH WEB APP MANIFEST (CHO ANDROID & PWA) -->
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,{
         %22name%22: %22DIARY%22,
@@ -27,7 +24,6 @@
             }
         ]
     }">
-
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -46,10 +42,9 @@
     </script>
 </head>
 <body class="bg-diary-bg min-h-screen flex items-center justify-center p-4 font-sans">
-
     <div class="w-full max-w-2xl bg-white rounded-2xl shadow-lg overflow-hidden p-6 border border-gray-100">
         <h1 class="text-xl font-bold text-center text-diary-blue tracking-wide mb-6">DIARY</h1>
-
+        
         <!-- 1. MÀN HÌNH KHÓA / ĐĂNG NHẬP -->
         <div id="lock-screen" class="space-y-4">
             <p id="lock-message" class="text-center text-diary-text text-sm">Nhập mật khẩu để mở nhật ký</p>
@@ -70,16 +65,13 @@
                     <button onclick="lockDiary()" class="text-diary-text hover:text-black">Khóa lại</button>
                 </div>
             </div>
-
             <!-- Ô tìm kiếm nhật ký -->
             <input type="text" id="search-input" oninput="loadDiaryList()" placeholder="Tìm kiếm nội dung nhật ký..." 
                 class="w-full px-4 py-2 bg-gray-50 border border-diary-border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text">
-
             <button onclick="openNewEditor()" 
                 class="w-full bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">
                 Viết nhật ký mới
             </button>
-
             <!-- Khu vực danh sách các ngày đã viết -->
             <div id="diary-list" class="space-y-2.5 max-h-64 overflow-y-auto pr-1">
                 <!-- Danh sách tự động render -->
@@ -122,7 +114,6 @@
                 <button type="button" onclick="setMood('🔥')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base" data-mood="🔥">🔥</button>
                 <button type="button" onclick="setMood('🤔')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base" data-mood="🤔">🤔</button>
             </div>
-
             <textarea id="entry-content" rows="5" placeholder="Hôm nay của bạn thế nào..."
                 class="w-full p-3 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 resize-none text-diary-text text-sm"></textarea>
             
@@ -146,6 +137,21 @@
             </div>
             <p id="changepass-status" class="text-center text-xs font-medium h-4"></p>
         </div>
+
+        <!-- 6. MODAL XÁC NHẬN MẬT KHẨU KHI SỬA / XÓA -->
+        <div id="auth-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+            <div class="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4 shadow-xl border border-gray-100">
+                <h3 id="auth-modal-title" class="text-sm font-semibold text-diary-text text-center">Xác nhận mật khẩu để tiếp tục</h3>
+                <input type="password" id="auth-password-input" placeholder="Nhập mật khẩu..." 
+                    onkeydown="if(event.key==='Enter') verifyAuthAction()"
+                    class="w-full px-4 py-2.5 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text text-sm">
+                <div class="flex space-x-3">
+                    <button onclick="closeAuthModal()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-sm">Hủy</button>
+                    <button onclick="verifyAuthAction()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">Xác nhận</button>
+                </div>
+                <p id="auth-status" class="text-center text-xs text-red-500 h-4 font-medium"></p>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -154,7 +160,6 @@
         const viewScreen = document.getElementById('view-screen');
         const editorScreen = document.getElementById('editor-screen');
         const changepassScreen = document.getElementById('changepass-screen');
-
         const passwordInput = document.getElementById('password-input');
         const diaryList = document.getElementById('diary-list');
         const searchInput = document.getElementById('search-input');
@@ -164,9 +169,11 @@
         const viewMood = document.getElementById('view-mood');
         const viewContent = document.getElementById('view-content');
         const saveStatus = document.getElementById('save-status');
-
+        
         let currentActiveDate = null;
         let selectedMood = null;
+        let pendingAction = null; // 'edit' hoặc 'delete'
+        let pendingDate = null;
 
         function handleUnlock() {
             const enteredPass = passwordInput.value;
@@ -206,22 +213,18 @@
             let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
             let keyword = searchInput.value.toLowerCase();
             let dates = Object.keys(entries).sort().reverse();
-
             let filteredDates = dates.filter(date => {
                 let content = (entries[date].content || entries[date]).toLowerCase();
                 let formattedDate = new Date(date).toLocaleDateString('vi-VN');
                 return content.includes(keyword) || formattedDate.includes(keyword) || date.includes(keyword);
             });
-
             if (filteredDates.length === 0) {
                 diaryList.innerHTML = '<p class="text-center text-gray-400 py-4 text-xs">Không tìm thấy bài nhật ký nào.</p>';
                 return;
             }
-
             filteredDates.forEach(date => {
                 let entryData = entries[date];
                 let moodIcon = (typeof entryData === 'object' && entryData.mood) ? entryData.mood : '';
-
                 let div = document.createElement('div');
                 div.className = "flex justify-between items-center p-3 bg-gray-50 border border-gray-100 rounded-xl hover:bg-gray-100/80 transition";
                 
@@ -234,8 +237,8 @@
                     </div>
                     <div class="space-x-1 text-xs flex items-center shrink-0">
                         <button onclick="openView('${date}')" class="px-2 py-1 bg-diary-blue/10 text-diary-blue font-medium rounded-lg hover:bg-diary-blue/20 transition">Xem</button>
-                        <button onclick="openEdit('${date}')" class="px-2 py-1 bg-gray-200 text-diary-text font-medium rounded-lg hover:bg-gray-300 transition">Sửa</button>
-                        <button onclick="deleteEntry('${date}')" class="px-2 py-1 bg-red-50 text-red-500 font-medium rounded-lg hover:bg-red-100 transition">Xóa</button>
+                        <button onclick="requestEdit('${date}')" class="px-2 py-1 bg-gray-200 text-diary-text font-medium rounded-lg hover:bg-gray-300 transition">Sửa</button>
+                        <button onclick="requestDelete('${date}')" class="px-2 py-1 bg-red-50 text-red-500 font-medium rounded-lg hover:bg-red-100 transition">Xóa</button>
                     </div>
                 `;
                 diaryList.appendChild(div);
@@ -264,12 +267,10 @@
             currentActiveDate = date;
             mainScreen.classList.add('hidden');
             viewScreen.classList.remove('hidden');
-
             let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
             let entryData = entries[date];
             let contentText = typeof entryData === 'object' ? entryData.content : entryData;
             let moodIcon = (typeof entryData === 'object' && entryData.mood) ? entryData.mood : '';
-
             let formattedDate = new Date(date).toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             
             viewMood.innerText = moodIcon;
@@ -278,8 +279,58 @@
         }
 
         function switchToEditFromView() {
-            viewScreen.classList.add('hidden');
-            openEdit(currentActiveDate);
+            requestEdit(currentActiveDate);
+        }
+
+        // Xử lý bảo mật trước khi Sửa hoặc Xóa
+        function requestEdit(date) {
+            pendingAction = 'edit';
+            pendingDate = date;
+            showAuthModal('Nhập mật khẩu để chỉnh sửa bài nhật ký');
+        }
+
+        function requestDelete(date) {
+            pendingAction = 'delete';
+            pendingDate = date;
+            showAuthModal('Nhập mật khẩu để xóa bài nhật ký');
+        }
+
+        function showAuthModal(title) {
+            document.getElementById('auth-modal-title').innerText = title;
+            document.getElementById('auth-password-input').value = '';
+            document.getElementById('auth-status').innerText = '';
+            document.getElementById('auth-modal').classList.remove('hidden');
+            document.getElementById('auth-password-input').focus();
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.add('hidden');
+            pendingAction = null;
+            pendingDate = null;
+        }
+
+        function verifyAuthAction() {
+            let enteredPass = document.getElementById('auth-password-input').value;
+            let savedPass = localStorage.getItem('diary_password');
+            let statusEl = document.getElementById('auth-status');
+
+            if (!enteredPass) {
+                statusEl.innerText = 'Vui lòng nhập mật khẩu!';
+                return;
+            }
+
+            if (enteredPass === savedPass) {
+                closeAuthModal();
+                if (pendingAction === 'edit') {
+                    viewScreen.classList.add('hidden');
+                    openEdit(pendingDate);
+                } else if (pendingAction === 'delete') {
+                    executeDelete(pendingDate);
+                }
+            } else {
+                statusEl.innerText = 'Mật khẩu không đúng!';
+                document.getElementById('auth-password-input').value = '';
+            }
         }
 
         function openNewEditor() {
@@ -312,13 +363,11 @@
             viewScreen.classList.add('hidden');
             editorScreen.classList.remove('hidden');
             saveStatus.innerText = '';
-
             currentActiveDate = date;
             entryDate.value = date;
             
             let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
             let entryData = entries[date];
-
             if (entryData && typeof entryData === 'object') {
                 entryContent.value = entryData.content || '';
                 if (entryData.mood) {
@@ -339,21 +388,18 @@
         function saveEntry() {
             let dateVal = entryDate.value;
             let contentVal = entryContent.value;
-
             if (!dateVal) { alert('Vui lòng chọn ngày!'); return; }
-
             let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
             entries[dateVal] = {
                 content: contentVal,
                 mood: selectedMood || ''
             };
-
             localStorage.setItem('diary_entries', JSON.stringify(entries));
             saveStatus.innerText = 'Đã lưu thành công';
             setTimeout(() => { saveStatus.innerText = ''; }, 2000);
         }
 
-        function deleteEntry(date) {
+        function executeDelete(date) {
             if (confirm(`Bạn có chắc chắn muốn xóa bài nhật ký ngày ${date} không?`)) {
                 let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
                 delete entries[date];
@@ -375,19 +421,16 @@
             let newPass = document.getElementById('new-pass').value;
             let statusText = document.getElementById('changepass-status');
             let savedPass = localStorage.getItem('diary_password');
-
             if (oldPass !== savedPass) {
                 statusText.className = "text-center text-xs font-medium text-red-500 h-4";
                 statusText.innerText = 'Mật khẩu hiện tại không đúng!';
                 return;
             }
-
             if (!newPass) {
                 statusText.className = "text-center text-xs font-medium text-red-500 h-4";
                 statusText.innerText = 'Vui lòng nhập mật khẩu mới!';
                 return;
             }
-
             localStorage.setItem('diary_password', newPass);
             statusText.className = "text-center text-xs font-medium text-diary-blue h-4";
             statusText.innerText = 'Đổi mật khẩu thành công!';
