@@ -41,121 +41,164 @@
         }
     </script>
 </head>
-<body class="bg-diary-bg min-h-screen flex items-center justify-center p-4 font-sans">
-    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-lg overflow-hidden p-6 border border-gray-100">
-        <h1 class="text-xl font-bold text-center text-diary-blue tracking-wide mb-6">DIARY</h1>
+<body class="bg-diary-bg h-screen w-screen overflow-hidden flex items-center justify-center p-3 sm:p-6 font-sans">
+    
+    <!-- MÀN HÌNH KHÓA BAN ĐẦU -->
+    <div id="lock-screen" class="w-full sm:max-w-xl bg-white sm:rounded-3xl shadow-xl p-6 sm:p-10 space-y-5 border border-gray-100">
+        <h1 class="text-2xl sm:text-3xl font-bold text-center text-diary-blue tracking-wide">DIARY</h1>
+        <p id="lock-message" class="text-center text-diary-text text-sm sm:text-base">Nhập mật khẩu để mở nhật ký</p>
+        <input type="password" id="password-input" placeholder="Mật khẩu..." 
+            class="w-full px-4 py-3 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text text-sm">
+        <button onclick="handleUnlock()" 
+            class="w-full bg-diary-blue text-white py-3 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">
+            Mở khóa
+        </button>
+    </div>
+
+    <!-- KHUNG GIAO DIỆN CHÍNH (VỪA KHÍT MÀN HÌNH - KHÔNG BỊ TRÀN CUỘN) -->
+    <div id="app-container" class="hidden w-full max-h-[92vh] sm:max-w-5xl bg-white sm:rounded-3xl shadow-xl overflow-hidden border border-gray-100 p-5 sm:p-7 flex flex-col justify-between">
         
-        <!-- 1. MÀN HÌNH KHÓA / ĐĂNG NHẬP -->
-        <div id="lock-screen" class="space-y-4">
-            <p id="lock-message" class="text-center text-diary-text text-sm">Nhập mật khẩu để mở nhật ký</p>
-            <input type="password" id="password-input" placeholder="Mật khẩu..." 
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+            
+            <!-- CỘT TRÁI (2/3 KHÔNG GIAN CHO NỘI DUNG CHÍNH) -->
+            <div class="md:col-span-2 space-y-4">
+                <div class="flex justify-between items-center pb-2 border-b border-gray-100">
+                    <h1 class="text-xl font-bold text-diary-blue tracking-wide">DIARY</h1>
+                    <span id="entry-count-badge" class="text-xs bg-diary-blue/10 text-diary-blue px-3 py-1 rounded-full font-medium"></span>
+                </div>
+
+                <!-- 1. MÀN HÌNH CHÍNH (Danh sách & Tìm kiếm) -->
+                <div id="main-screen" class="space-y-3">
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </span>
+                        <input type="text" id="search-input" oninput="loadDiaryList()" placeholder="" 
+                            class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-diary-border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text">
+                    </div>
+
+                    <button onclick="openNewEditor()" 
+                        class="w-full bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm flex items-center justify-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        <span>Viết nhật ký mới</span>
+                    </button>
+
+                    <!-- DANH SÁCH NHẬT KÝ (Giới hạn chiều cao vừa vặn để không bị đẩy trang xuống) -->
+                    <div id="diary-list" class="space-y-2.5 max-h-[260px] sm:max-h-[280px] overflow-y-auto pr-1">
+                        <!-- Danh sách nhật ký -->
+                    </div>
+                </div>
+
+                <!-- 2. MÀN HÌNH XEM CHI TIẾT -->
+                <div id="view-screen" class="hidden space-y-3">
+                    <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                        <div class="flex items-center space-x-2">
+                            <span id="view-mood" class="text-lg"></span>
+                            <span id="view-date-title" class="font-semibold text-diary-blue text-sm"></span>
+                        </div>
+                        <button onclick="backToMain()" class="text-xs text-diary-text hover:text-diary-blue transition">Quay lại</button>
+                    </div>
+                    <div id="view-content" class="w-full p-3.5 bg-gray-50 border border-diary-border rounded-xl h-56 overflow-y-auto text-diary-text text-sm whitespace-pre-wrap leading-relaxed"></div>
+                    <div class="flex space-x-3">
+                        <button onclick="switchToEditFromView()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">
+                            Sửa bài này
+                        </button>
+                        <button onclick="backToMain()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-sm">
+                            Đóng
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. MÀN HÌNH SOẠN THẢO / SỬA -->
+                <div id="editor-screen" class="hidden space-y-3">
+                    <div class="flex justify-between items-center">
+                        <input type="date" id="entry-date" class="border border-diary-border bg-gray-50 px-3 py-1.5 rounded-xl text-xs text-diary-text focus:outline-none focus:ring-2 focus:ring-diary-blue/30">
+                        <button onclick="backToMain()" class="text-xs text-diary-text hover:text-diary-blue transition">Quay lại</button>
+                    </div>
+                    
+                    <div class="flex items-center space-x-2 bg-gray-50 px-3 py-1.5 border border-diary-border rounded-xl">
+                        <span class="text-xs text-diary-text font-medium mr-1">Tâm trạng:</span>
+                        <button type="button" onclick="setMood('😊')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base" data-mood="😊">😊</button>
+                        <button type="button" onclick="setMood('😌')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base" data-mood="😌">😌</button>
+                        <button type="button" onclick="setMood('😢')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base" data-mood="😢">😢</button>
+                        <button type="button" onclick="setMood('🔥')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base" data-mood="🔥">🔥</button>
+                        <button type="button" onclick="setMood('🤔')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base" data-mood="🤔">🤔</button>
+                    </div>
+                    <textarea id="entry-content" rows="5" placeholder="Hôm nay của bạn thế nào..."
+                        class="w-full p-3 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 resize-none text-diary-text text-sm leading-relaxed"></textarea>
+                    
+                    <button onclick="saveEntry()" 
+                        class="w-full bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">
+                        Lưu nhật ký
+                    </button>
+                    <p id="save-status" class="text-center text-xs text-diary-blue h-3 font-medium"></p>
+                </div>
+
+                <!-- 4. MÀN HÌNH ĐỔI MẬT KHẨU -->
+                <div id="changepass-screen" class="hidden space-y-3">
+                    <h2 class="text-sm font-semibold text-diary-text border-b border-gray-100 pb-2">Đổi mật khẩu</h2>
+                    <input type="password" id="old-pass" placeholder="Mật khẩu hiện tại" 
+                        class="w-full px-4 py-2.5 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text text-sm">
+                    <input type="password" id="new-pass" placeholder="Mật khẩu mới" 
+                        class="w-full px-4 py-2.5 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text text-sm">
+                    <div class="flex space-x-3 pt-1">
+                        <button onclick="backToMain()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-sm">Hủy</button>
+                        <button onclick="updatePassword()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">Cập nhật</button>
+                    </div>
+                    <p id="changepass-status" class="text-center text-xs font-medium h-3"></p>
+                </div>
+            </div>
+
+            <!-- CỘT PHẢI (SIDEBAR CÀI ĐẶT & THẺ ĐỘNG LỰC) -->
+            <div class="md:col-span-1 bg-gray-50 p-4 sm:p-5 rounded-2xl border border-gray-100 flex flex-col justify-between space-y-5">
+                <div class="space-y-3">
+                    <h3 class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Cài đặt & Tài khoản</h3>
+                    
+                    <div class="space-y-2">
+                        <button onclick="showChangePassScreen()" class="w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-diary-text hover:border-diary-blue/50 hover:text-diary-blue transition flex items-center justify-between">
+                            <span>Đổi mật khẩu</span>
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 0121 9z"></path></svg>
+                        </button>
+                        <button onclick="lockDiary()" class="w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-red-500 hover:bg-red-50 hover:border-red-200 transition flex items-center justify-between">
+                            <span>Khóa ứng dụng</span>
+                            <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- THẺ CÂU NÓI ĐỘNG LỰC BẢN THÂN MỖI NGÀY -->
+                <div class="p-3.5 bg-white border border-diary-blue/20 rounded-2xl shadow-sm space-y-2">
+                    <div class="flex items-center space-x-1.5 text-diary-blue font-semibold text-xs">
+                        <span>✨</span>
+                        <span>Động lực mỗi ngày</span>
+                    </div>
+                    <p id="daily-quote" class="text-xs text-diary-text italic leading-relaxed font-medium">
+                        "Hãy kiên trì từng chút một, mỗi ngày bạn viết nên một trang đời rực rỡ."
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL XÁC NHẬN MẬT KHẨU KHI SỬA / XÓA -->
+    <div id="auth-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4 shadow-xl border border-gray-100">
+            <h3 id="auth-modal-title" class="text-sm font-semibold text-diary-text text-center">Xác nhận mật khẩu để tiếp tục</h3>
+            <input type="password" id="auth-password-input" placeholder="Nhập mật khẩu..." 
+                onkeydown="if(event.key==='Enter') verifyAuthAction()"
                 class="w-full px-4 py-2.5 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text text-sm">
-            <button onclick="handleUnlock()" 
-                class="w-full bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">
-                Mở khóa
-            </button>
-        </div>
-
-        <!-- 2. MÀN HÌNH CHÍNH (Danh sách & Tìm kiếm) -->
-        <div id="main-screen" class="hidden space-y-4">
-            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
-                <h2 class="text-sm font-semibold text-diary-text">Danh sách nhật ký</h2>
-                <div class="space-x-3 text-xs">
-                    <button onclick="showChangePassScreen()" class="text-diary-blue hover:underline">Đổi mật khẩu</button>
-                    <button onclick="lockDiary()" class="text-diary-text hover:text-black">Khóa lại</button>
-                </div>
-            </div>
-            <!-- Ô tìm kiếm nhật ký -->
-            <input type="text" id="search-input" oninput="loadDiaryList()" placeholder="Tìm kiếm nội dung nhật ký..." 
-                class="w-full px-4 py-2 bg-gray-50 border border-diary-border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text">
-            <button onclick="openNewEditor()" 
-                class="w-full bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">
-                Viết nhật ký mới
-            </button>
-            <!-- Khu vực danh sách các ngày đã viết -->
-            <div id="diary-list" class="space-y-2.5 max-h-64 overflow-y-auto pr-1">
-                <!-- Danh sách tự động render -->
-            </div>
-        </div>
-
-        <!-- 3. MÀN HÌNH XEM CHI TIẾT -->
-        <div id="view-screen" class="hidden space-y-4">
-            <div class="flex justify-between items-center border-b border-gray-100 pb-2">
-                <div class="flex items-center space-x-2">
-                    <span id="view-mood" class="text-lg"></span>
-                    <span id="view-date-title" class="font-semibold text-diary-blue text-sm"></span>
-                </div>
-                <button onclick="backToMain()" class="text-xs text-diary-text hover:text-diary-blue transition">Quay lại</button>
-            </div>
-            <div id="view-content" class="w-full p-3.5 bg-gray-50 border border-diary-border rounded-xl h-48 overflow-y-auto text-diary-text text-sm whitespace-pre-wrap"></div>
             <div class="flex space-x-3">
-                <button onclick="switchToEditFromView()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">
-                    Sửa bài này
-                </button>
-                <button onclick="backToMain()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-sm">
-                    Đóng
-                </button>
+                <button onclick="closeAuthModal()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-sm">Hủy</button>
+                <button onclick="verifyAuthAction()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">Xác nhận</button>
             </div>
-        </div>
-
-        <!-- 4. MÀN HÌNH SOẠN THẢO / SỬA -->
-        <div id="editor-screen" class="hidden space-y-3">
-            <div class="flex justify-between items-center">
-                <input type="date" id="entry-date" class="border border-diary-border bg-gray-50 px-3 py-1.5 rounded-xl text-xs text-diary-text focus:outline-none focus:ring-2 focus:ring-diary-blue/30">
-                <button onclick="backToMain()" class="text-xs text-diary-text hover:text-diary-blue transition">Quay lại</button>
-            </div>
-            
-            <!-- Chọn tâm trạng -->
-            <div class="flex items-center space-x-2 bg-gray-50 px-3 py-2 border border-diary-border rounded-xl">
-                <span class="text-xs text-diary-text font-medium mr-1">Tâm trạng:</span>
-                <button type="button" onclick="setMood('😊')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base" data-mood="😊">😊</button>
-                <button type="button" onclick="setMood('😌')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base" data-mood="😌">😌</button>
-                <button type="button" onclick="setMood('😢')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base" data-mood="😢">😢</button>
-                <button type="button" onclick="setMood('🔥')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base" data-mood="🔥">🔥</button>
-                <button type="button" onclick="setMood('🤔')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base" data-mood="🤔">🤔</button>
-            </div>
-            <textarea id="entry-content" rows="5" placeholder="Hôm nay của bạn thế nào..."
-                class="w-full p-3 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 resize-none text-diary-text text-sm"></textarea>
-            
-            <button onclick="saveEntry()" 
-                class="w-full bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">
-                Lưu nhật ký
-            </button>
-            <p id="save-status" class="text-center text-xs text-diary-blue h-4 font-medium"></p>
-        </div>
-
-        <!-- 5. MÀN HÌNH ĐỔI MẬT KHẨU -->
-        <div id="changepass-screen" class="hidden space-y-3">
-            <h2 class="text-sm font-semibold text-diary-text border-b border-gray-100 pb-3">Đổi mật khẩu</h2>
-            <input type="password" id="old-pass" placeholder="Mật khẩu hiện tại" 
-                class="w-full px-4 py-2.5 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text text-sm">
-            <input type="password" id="new-pass" placeholder="Mật khẩu mới" 
-                class="w-full px-4 py-2.5 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text text-sm">
-            <div class="flex space-x-3 pt-1">
-                <button onclick="backToMain()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-sm">Hủy</button>
-                <button onclick="updatePassword()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">Cập nhật</button>
-            </div>
-            <p id="changepass-status" class="text-center text-xs font-medium h-4"></p>
-        </div>
-
-        <!-- 6. MODAL XÁC NHẬN MẬT KHẨU KHI SỬA / XÓA -->
-        <div id="auth-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-            <div class="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4 shadow-xl border border-gray-100">
-                <h3 id="auth-modal-title" class="text-sm font-semibold text-diary-text text-center">Xác nhận mật khẩu để tiếp tục</h3>
-                <input type="password" id="auth-password-input" placeholder="Nhập mật khẩu..." 
-                    onkeydown="if(event.key==='Enter') verifyAuthAction()"
-                    class="w-full px-4 py-2.5 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text text-sm">
-                <div class="flex space-x-3">
-                    <button onclick="closeAuthModal()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-sm">Hủy</button>
-                    <button onclick="verifyAuthAction()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">Xác nhận</button>
-                </div>
-                <p id="auth-status" class="text-center text-xs text-red-500 h-4 font-medium"></p>
-            </div>
+            <p id="auth-status" class="text-center text-xs text-red-500 h-4 font-medium"></p>
         </div>
     </div>
 
     <script>
         const lockScreen = document.getElementById('lock-screen');
+        const appContainer = document.getElementById('app-container');
         const mainScreen = document.getElementById('main-screen');
         const viewScreen = document.getElementById('view-screen');
         const editorScreen = document.getElementById('editor-screen');
@@ -169,11 +212,28 @@
         const viewMood = document.getElementById('view-mood');
         const viewContent = document.getElementById('view-content');
         const saveStatus = document.getElementById('save-status');
+        const entryCountBadge = document.getElementById('entry-count-badge');
+        const dailyQuoteEl = document.getElementById('daily-quote');
         
         let currentActiveDate = null;
         let selectedMood = null;
         let pendingAction = null; 
         let pendingDate = null;
+
+        const motivationalQuotes = [
+            '"Hãy kiên trì từng chút một, mỗi ngày bạn viết nên một trang đời rực rỡ."',
+            '"Tương lai phụ thuộc vào những gì bạn làm hôm nay."',
+            '"Mỗi ngày mới là một cơ hội để bạn bắt đầu lại và làm tốt hơn."',
+            '"Đừng chờ đợi cơ hội, hãy tự tạo ra nó."',
+            '"Hành trình vạn dặm luôn bắt đầu bằng một bước chân nhỏ."',
+            '"Hãy tử tế với chính mình, bạn đang làm rất tốt rồi!"',
+            '"Niềm tin vào bản thân là chìa khóa mở mọi cánh cửa thành công."'
+        ];
+
+        function getRandomQuote() {
+            const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
+            dailyQuoteEl.innerText = motivationalQuotes[randomIndex];
+        }
 
         function handleUnlock() {
             const enteredPass = passwordInput.value;
@@ -194,16 +254,18 @@
 
         function goToMain() {
             lockScreen.classList.add('hidden');
+            appContainer.classList.remove('hidden');
             viewScreen.classList.add('hidden');
             editorScreen.classList.add('hidden');
             changepassScreen.classList.add('hidden');
             mainScreen.classList.remove('hidden');
             searchInput.value = '';
+            getRandomQuote();
             loadDiaryList();
         }
 
         function lockDiary() {
-            mainScreen.classList.add('hidden');
+            appContainer.classList.add('hidden');
             lockScreen.classList.remove('hidden');
             passwordInput.value = '';
         }
@@ -211,34 +273,51 @@
         function loadDiaryList() {
             diaryList.innerHTML = '';
             let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
-            let keyword = searchInput.value.toLowerCase();
+            let keyword = searchInput.value.toLowerCase().trim();
             let dates = Object.keys(entries).sort().reverse();
+
+            entryCountBadge.innerText = `${dates.length} bài viết`;
+            
             let filteredDates = dates.filter(date => {
-                let content = (entries[date].content || entries[date]).toLowerCase();
-                let formattedDate = new Date(date).toLocaleDateString('vi-VN');
-                return content.includes(keyword) || formattedDate.includes(keyword) || date.includes(keyword);
+                let entryData = entries[date];
+                let content = (typeof entryData === 'object' && entryData !== null) ? (entryData.content || '') : entryData;
+                
+                let dateObj = new Date(date + 'T00:00:00'); 
+                let formattedDateStr = dateObj.toLocaleDateString('vi-VN');
+                
+                let fullWeekdayStr = dateObj.toLocaleDateString('vi-VN', { weekday: 'long' }).toLowerCase();
+                let shortWeekdayStr = dateObj.toLocaleDateString('vi-VN', { weekday: 'short' }).toLowerCase();
+
+                let isMatchContent = content.toLowerCase().includes(keyword);
+                let isMatchDate = formattedDateStr.includes(keyword) || date.includes(keyword);
+                let isMatchWeekday = fullWeekdayStr.includes(keyword) || shortWeekdayStr.includes(keyword);
+
+                return isMatchContent || isMatchDate || isMatchWeekday;
             });
+
             if (filteredDates.length === 0) {
                 diaryList.innerHTML = '<p class="text-center text-gray-400 py-4 text-xs">Không tìm thấy bài nhật ký nào.</p>';
                 return;
             }
+
             filteredDates.forEach(date => {
                 let entryData = entries[date];
-                let moodIcon = (typeof entryData === 'object' && entryData.mood) ? entryData.mood : '';
+                let moodIcon = (typeof entryData === 'object' && entryData !== null && entryData.mood) ? entryData.mood : '';
                 let div = document.createElement('div');
                 div.className = "flex justify-between items-center p-3 bg-gray-50 border border-gray-100 rounded-xl hover:bg-gray-100/80 transition";
                 
-                let formattedDate = new Date(date).toLocaleDateString('vi-VN', { weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric' });
+                let dateObj = new Date(date + 'T00:00:00');
+                let formattedDate = dateObj.toLocaleDateString('vi-VN', { weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric' });
                 
                 div.innerHTML = `
                     <div class="flex items-center space-x-2.5 overflow-hidden">
                         <span class="text-base">${moodIcon}</span>
-                        <span class="font-medium text-diary-text text-xs truncate">${formattedDate}</span>
+                        <span class="font-medium text-diary-text text-xs sm:text-sm truncate">${formattedDate}</span>
                     </div>
                     <div class="space-x-1 text-xs flex items-center shrink-0">
-                        <button onclick="openView('${date}')" class="px-2 py-1 bg-diary-blue/10 text-diary-blue font-medium rounded-lg hover:bg-diary-blue/20 transition">Xem</button>
-                        <button onclick="requestEdit('${date}')" class="px-2 py-1 bg-gray-200 text-diary-text font-medium rounded-lg hover:bg-gray-300 transition">Sửa</button>
-                        <button onclick="requestDelete('${date}')" class="px-2 py-1 bg-red-50 text-red-500 font-medium rounded-lg hover:bg-red-100 transition">Xóa</button>
+                        <button onclick="openView('${date}')" class="px-2.5 py-1 bg-diary-blue/10 text-diary-blue font-medium rounded-lg hover:bg-diary-blue/20 transition">Xem</button>
+                        <button onclick="requestEdit('${date}')" class="px-2.5 py-1 bg-gray-200 text-diary-text font-medium rounded-lg hover:bg-gray-300 transition">Sửa</button>
+                        <button onclick="requestDelete('${date}')" class="px-2.5 py-1 bg-red-50 text-red-500 font-medium rounded-lg hover:bg-red-100 transition">Xóa</button>
                     </div>
                 `;
                 diaryList.appendChild(div);
@@ -271,7 +350,9 @@
             let entryData = entries[date];
             let contentText = typeof entryData === 'object' ? entryData.content : entryData;
             let moodIcon = (typeof entryData === 'object' && entryData.mood) ? entryData.mood : '';
-            let formattedDate = new Date(date).toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            
+            let dateObj = new Date(date + 'T00:00:00');
+            let formattedDate = dateObj.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             
             viewMood.innerText = moodIcon;
             viewDateTitle.innerText = `Ngày ${formattedDate}`;
@@ -312,24 +393,19 @@
             let enteredPass = document.getElementById('auth-password-input').value;
             let savedPass = localStorage.getItem('diary_password');
             let statusEl = document.getElementById('auth-status');
-
             if (!enteredPass) {
                 statusEl.innerText = 'Vui lòng nhập mật khẩu!';
                 return;
             }
-
             if (!savedPass) {
                 localStorage.setItem('diary_password', enteredPass);
                 savedPass = enteredPass;
             }
-
             if (enteredPass === savedPass) {
-                // Lưu lại hành động trước khi đóng modal
                 let action = pendingAction;
                 let dateToProcess = pendingDate;
                 
                 closeAuthModal();
-
                 if (action === 'edit') {
                     viewScreen.classList.add('hidden');
                     openEdit(dateToProcess);
@@ -419,6 +495,8 @@
 
         function showChangePassScreen() {
             mainScreen.classList.add('hidden');
+            viewScreen.classList.add('hidden');
+            editorScreen.classList.add('hidden');
             changepassScreen.classList.remove('hidden');
             document.getElementById('old-pass').value = '';
             document.getElementById('new-pass').value = '';
@@ -431,17 +509,17 @@
             let statusText = document.getElementById('changepass-status');
             let savedPass = localStorage.getItem('diary_password');
             if (oldPass !== savedPass) {
-                statusText.className = "text-center text-xs font-medium text-red-500 h-4";
+                statusText.className = "text-center text-xs font-medium text-red-500 h-3";
                 statusText.innerText = 'Mật khẩu hiện tại không đúng!';
                 return;
             }
             if (!newPass) {
-                statusText.className = "text-center text-xs font-medium text-red-500 h-4";
+                statusText.className = "text-center text-xs font-medium text-red-500 h-3";
                 statusText.innerText = 'Vui lòng nhập đúng mật khẩu mới!';
                 return;
             }
             localStorage.setItem('diary_password', newPass);
-            statusText.className = "text-center text-xs font-medium text-diary-blue h-4";
+            statusText.className = "text-center text-xs font-medium text-diary-blue h-3";
             statusText.innerText = 'Đổi mật khẩu thành công!';
             setTimeout(() => { goToMain(); }, 1500);
         }
