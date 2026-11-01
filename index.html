@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DIARY</title>
     <!-- 1. ICON TRÊN TAB TRÌNH DUYỆT WEB -->
-    <link rel="icon" type="image/png" href="https://cdn.phototourl.com/free/2026-08-19-45c424ce-b3c7-4e99-be56-8fbfba990fa7.png">
-    <!-- 2. ICON KHI THÊM VÀO MÀN HÌNH CHÍNH IOS (IPHONE/IPAD) -->
-    <link rel="apple-touch-icon" href="https://cdn.phototourl.com/free/2026-08-19-b22a9305-4f98-4ff6-8eac-6504bd98b7e0.png">
-    <!-- 3. CẤU HÌNH WEB APP MANIFEST (CHO ANDROID & PWA) -->
+    <link rel="icon" type="image/png" href="https://cdn.phototourl.com/member/2026-11-01-4ccc1fd3-8c03-4211-b027-4f6c30fccfdc.png">
+    <link rel="apple-touch-icon" href="https://cdn.phototourl.com/member/2026-11-01-4ccc1fd3-8c03-4211-b027-4f6c30fccfdc.png">
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,{
         %22name%22: %22DIARY%22,
         %22short_name%22: %22DIARY%22,
@@ -18,7 +16,7 @@
         %22theme_color%22: %22%230056A3%22,
         %22icons%22: [
             {
-                %22src%22: %22https://cdn.phototourl.com/free/2026-08-19-b22a9305-4f98-4ff6-8eac-6504bd98b7e0.png%22,
+                %22src%22: %22https://cdn.phototourl.com/member/2026-11-01-4ccc1fd3-8c03-4211-b027-4f6c30fccfdc.png%22,
                 %22sizes%22: %22512x512%22,
                 %22type%22: %22image/png%22
             }
@@ -34,7 +32,8 @@
                         'diary-bg': '#F2F9F5',      
                         'diary-blue': '#0056A3',    
                         'diary-text': '#4B5563',    
-                        'diary-border': '#E5E7EB'   
+                        'diary-border': '#E5E7EB',
+                        'spotify-green': '#1DB954'
                     }
                 }
             }
@@ -44,37 +43,40 @@
 <body class="bg-diary-bg h-screen w-screen overflow-hidden flex items-center justify-center p-3 sm:p-6 font-sans">
     
     <!-- MÀN HÌNH KHÓA BAN ĐẦU -->
-    <div id="lock-screen" class="w-full sm:max-w-xl bg-white sm:rounded-3xl shadow-xl p-6 sm:p-10 space-y-5 border border-gray-100">
-        <h1 class="text-2xl sm:text-3xl font-bold text-center text-diary-blue tracking-wide">DIARY</h1>
-        <p id="lock-message" class="text-center text-diary-text text-sm sm:text-base">Nhập mật khẩu để mở nhật ký</p>
-        <input type="password" id="password-input" placeholder="Mật khẩu..." 
-            class="w-full px-4 py-3 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text text-sm">
+    <div id="lock-screen" class="w-full sm:max-w-xl bg-white sm:rounded-3xl shadow-xl p-6 sm:p-10 space-y-6 border border-gray-100 text-center">
+        <h1 class="text-2xl sm:text-3xl font-bold text-diary-blue tracking-wide cursor-pointer">DIARY</h1>
+        <p id="lock-message" class="text-diary-text text-sm sm:text-base font-medium">Nhập mã PIN</p>
+        
+        <!-- 3 Ô GÕ PIN -->
+        <div class="flex justify-center space-x-3">
+            <input type="password" maxlength="1" class="pin-box w-14 h-14 text-center text-2xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text" oninput="moveToNext(this, 1)" onkeydown="handlePinKey(event, 0)">
+            <input type="password" maxlength="1" class="pin-box w-14 h-14 text-center text-2xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text" oninput="moveToNext(this, 2)" onkeydown="handlePinKey(event, 1)">
+            <input type="password" maxlength="1" class="pin-box w-14 h-14 text-center text-2xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text" oninput="moveToNext(this, 3)" onkeydown="handlePinKey(event, 2)">
+        </div>
+
         <button onclick="handleUnlock()" 
             class="w-full bg-diary-blue text-white py-3 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">
             Mở khóa
         </button>
     </div>
 
-    <!-- KHUNG GIAO DIỆN CHÍNH (VỪA KHÍT MÀN HÌNH - KHÔNG BỊ TRÀN CUỘN) -->
-    <div id="app-container" class="hidden w-full max-h-[92vh] sm:max-w-5xl bg-white sm:rounded-3xl shadow-xl overflow-hidden border border-gray-100 p-5 sm:p-7 flex flex-col justify-between">
+    <!-- KHUNG GIAO DIỆN CHÍNH -->
+    <div id="app-container" class="hidden w-full max-h-[95vh] sm:max-w-5xl bg-white sm:rounded-3xl shadow-xl overflow-hidden border border-gray-100 p-5 sm:p-7 flex flex-col justify-between">
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
             
             <!-- CỘT TRÁI (2/3 KHÔNG GIAN CHO NỘI DUNG CHÍNH) -->
             <div class="md:col-span-2 space-y-4">
                 <div class="flex justify-between items-center pb-2 border-b border-gray-100">
-                    <h1 class="text-xl font-bold text-diary-blue tracking-wide">DIARY</h1>
+                    <h1 onclick="goToMain()" class="text-xl font-bold text-diary-blue tracking-wide cursor-pointer hover:opacity-80 transition">DIARY</h1>
                     <span id="entry-count-badge" class="text-xs bg-diary-blue/10 text-diary-blue px-3 py-1 rounded-full font-medium"></span>
                 </div>
 
-                <!-- 1. MÀN HÌNH CHÍNH (Danh sách & Tìm kiếm) -->
+                <!-- 1. MÀN HÌNH CHÍNH (Nhật ký tuần này) -->
                 <div id="main-screen" class="space-y-3">
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        </span>
-                        <input type="text" id="search-input" oninput="loadDiaryList()" placeholder="" 
-                            class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-diary-border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold text-diary-blue uppercase tracking-wider">✨ Nhật ký tuần này</span>
+                        <span id="current-week-label" class="text-xs text-gray-400"></span>
                     </div>
 
                     <button onclick="openNewEditor()" 
@@ -83,9 +85,8 @@
                         <span>Viết nhật ký mới</span>
                     </button>
 
-                    <!-- DANH SÁCH NHẬT KÝ (Giới hạn chiều cao vừa vặn để không bị đẩy trang xuống) -->
                     <div id="diary-list" class="space-y-2.5 max-h-[260px] sm:max-h-[280px] overflow-y-auto pr-1">
-                        <!-- Danh sách nhật ký -->
+                        <!-- Danh sách nhật ký tuần này -->
                     </div>
                 </div>
 
@@ -96,24 +97,28 @@
                             <span id="view-mood" class="text-lg"></span>
                             <span id="view-date-title" class="font-semibold text-diary-blue text-sm"></span>
                         </div>
-                        <button onclick="backToMain()" class="text-xs text-diary-text hover:text-diary-blue transition">Quay lại</button>
                     </div>
-                    <div id="view-content" class="w-full p-3.5 bg-gray-50 border border-diary-border rounded-xl h-56 overflow-y-auto text-diary-text text-sm whitespace-pre-wrap leading-relaxed"></div>
-                    <div class="flex space-x-3">
+                    
+                    <div id="view-content" class="w-full p-3.5 bg-gray-50 border border-diary-border rounded-xl h-36 overflow-y-auto text-diary-text text-sm whitespace-pre-wrap leading-relaxed"></div>
+                    
+                    <div id="spotify-player-container" class="hidden">
+                        <iframe id="spotify-iframe" style="border-radius:12px" src="" width="100%" height="80" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                    </div>
+
+                    <div class="flex space-x-3 pt-1">
                         <button onclick="switchToEditFromView()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">
                             Sửa bài này
                         </button>
-                        <button onclick="backToMain()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-sm">
+                        <button onclick="goToMain()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-sm">
                             Đóng
                         </button>
                     </div>
                 </div>
 
-                <!-- 3. MÀN HÌNH SOẠN THẢO / SỬA -->
-                <div id="editor-screen" class="hidden space-y-3">
+                <!-- 3. MÀN HÌNH SOẠN THẢO -->
+                <div id="editor-screen" class="hidden space-y-2.5">
                     <div class="flex justify-between items-center">
                         <input type="date" id="entry-date" class="border border-diary-border bg-gray-50 px-3 py-1.5 rounded-xl text-xs text-diary-text focus:outline-none focus:ring-2 focus:ring-diary-blue/30">
-                        <button onclick="backToMain()" class="text-xs text-diary-text hover:text-diary-blue transition">Quay lại</button>
                     </div>
                     
                     <div class="flex items-center space-x-2 bg-gray-50 px-3 py-1.5 border border-diary-border rounded-xl">
@@ -124,7 +129,14 @@
                         <button type="button" onclick="setMood('🔥')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base" data-mood="🔥">🔥</button>
                         <button type="button" onclick="setMood('🤔')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base" data-mood="🤔">🤔</button>
                     </div>
-                    <textarea id="entry-content" rows="5" placeholder="Hôm nay của bạn thế nào..."
+
+                    <div class="relative flex items-center">
+                        <span class="absolute left-3 text-spotify-green font-bold text-sm">🎵</span>
+                        <input type="text" id="spotify-link-input" placeholder="Dán link bài hát Spotify vào đây..."
+                            class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-diary-border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-spotify-green/30 text-diary-text">
+                    </div>
+
+                    <textarea id="entry-content" rows="4" placeholder="Hôm nay của bạn thế nào..."
                         class="w-full p-3 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 resize-none text-diary-text text-sm leading-relaxed"></textarea>
                     
                     <button onclick="saveEntry()" 
@@ -134,29 +146,240 @@
                     <p id="save-status" class="text-center text-xs text-diary-blue h-3 font-medium"></p>
                 </div>
 
-                <!-- 4. MÀN HÌNH ĐỔI MẬT KHẨU -->
+                <!-- 4. KHO TẢNG KÝ ỨC (Lưu trữ chia theo tuần) -->
+                <div id="archive-screen" class="hidden space-y-3">
+                    <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                        <h2 class="text-sm font-semibold text-diary-blue">📦 Kho tàng ký ức (Phân theo tuần)</h2>
+                    </div>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </span>
+                        <input type="text" id="archive-search-input" oninput="loadArchiveList()" placeholder="Tìm kiếm theo ngày, thứ hoặc nội dung..." 
+                            class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-diary-border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text">
+                    </div>
+                    <div id="archive-list" class="space-y-4 max-h-[260px] sm:max-h-[280px] overflow-y-auto pr-1">
+                        <!-- Danh sách lưu trữ phân theo tuần -->
+                    </div>
+                </div>
+
+                <!-- 5. THỜI KHÓA BIỂU ĐÚNG CHUẨN MỚI (1 Ô TO = 2 Ô NHỎ, KHÔNG GIỜ VÀO RA CHƠI / ĂN TRƯA) -->
+                <div id="timetable-screen" class="hidden space-y-3">
+                    <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                        <h2 class="text-sm font-semibold text-diary-blue">📅 Thời khóa biểu lớp 7</h2>
+                    </div>
+                    <div class="max-h-[310px] overflow-y-auto pr-1">
+                        <table class="w-full text-left text-[11px] border-collapse">
+                            <thead>
+                                <tr class="bg-cyan-50 text-cyan-900 border-b border-cyan-100">
+                                    <th class="p-2 border-r border-cyan-100 font-bold w-1/5">Thứ 2</th>
+                                    <th class="p-2 border-r border-cyan-100 font-bold w-1/5">Thứ 3</th>
+                                    <th class="p-2 border-r border-cyan-100 font-bold w-1/5">Thứ 4</th>
+                                    <th class="p-2 border-r border-cyan-100 font-bold w-1/5">Thứ 5</th>
+                                    <th class="p-2 font-bold w-1/5">Thứ 6</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 text-diary-text">
+                                <!-- Tiết 1 & 2 Sáng -->
+                                <tr class="align-top">
+                                    <td class="p-1.5 border-r border-gray-100">
+                                        <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
+                                            <span>HĐTN - HN</span>
+                                            <span class="text-[10px] opacity-75 mt-0.5">7:15 - 8:45</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-1.5 border-r border-gray-100 space-y-1">
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
+                                            <span>KHTN</span>
+                                        </div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
+                                            <span>Ngoại Ngữ</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-1.5 border-r border-gray-100 space-y-1">
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
+                                            <span>Công Nghệ</span>
+                                        </div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
+                                            <span>GDĐP</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-1.5 border-r border-gray-100 space-y-1">
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
+                                            <span>HĐTN</span>
+                                        </div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
+                                            <span>KHTN</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-1.5">
+                                        <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
+                                            <span>KHTN</span>
+                                            <span class="text-[10px] opacity-75 mt-0.5">7:15 - 8:45</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Ra chơi -->
+                                <tr class="bg-cyan-50/40">
+                                    <td colspan="5" class="p-1 text-center font-medium text-cyan-800 text-[10px]">Ra chơi</td>
+                                </tr>
+                                <!-- Tiết 3 & 4 Sáng -->
+                                <tr class="align-top">
+                                    <td class="p-1.5 border-r border-gray-100">
+                                        <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
+                                            <span>GDTC</span>
+                                            <span class="text-[10px] opacity-75 mt-0.5">9:15 - 10:45</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-1.5 border-r border-gray-100">
+                                        <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
+                                            <span>Văn</span>
+                                            <span class="text-[10px] opacity-75 mt-0.5">9:15 - 10:45</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-1.5 border-r border-gray-100">
+                                        <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
+                                            <span>Ngoại Ngữ</span>
+                                            <span class="text-[10px] opacity-75 mt-0.5">9:15 - 10:45</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-1.5 border-r border-gray-100">
+                                        <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
+                                            <span>Toán</span>
+                                            <span class="text-[10px] opacity-75 mt-0.5">9:15 - 10:45</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-1.5 space-y-1">
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
+                                            <span>Văn</span>
+                                        </div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
+                                            <span>LS - ĐL</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Ăn trưa - Ngủ trưa -->
+                                <tr class="bg-gray-50/60">
+                                    <td colspan="5" class="p-1.5 text-center font-medium text-gray-600 text-[10px]">Ăn trưa - Ngủ trưa</td>
+                                </tr>
+                                <!-- Tiết 1 & 2 Chiều -->
+                                <tr class="align-top">
+                                    <td class="p-1.5 border-r border-gray-100 space-y-1">
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
+                                            <span>Văn</span>
+                                        </div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
+                                            <span>TATC</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-1.5 border-r border-gray-100">
+                                        <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
+                                            <span>TATC</span>
+                                            <span class="text-[10px] opacity-75 mt-0.5">1:15 - 2:45</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-1.5 border-r border-gray-100 space-y-1">
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
+                                            <span>GDCD</span>
+                                        </div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
+                                            <span>Tin</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-1.5 border-r border-gray-100 space-y-1">
+                                        <div class="bg-gray-50 text-gray-400 p-1.5 rounded-lg text-center italic h-[36px] flex flex-col justify-center">Trống</div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
+                                            <span>LS - ĐL</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-1.5 space-y-1">
+                                        <div class="bg-gray-50 text-gray-400 p-1.5 rounded-lg text-center italic h-[36px] flex flex-col justify-center">Trống</div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
+                                            <span>Toán</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Ra chơi chiều -->
+                                <tr class="bg-cyan-50/40">
+                                    <td colspan="5" class="p-1 text-center font-medium text-cyan-800 text-[10px]">Ra chơi</td>
+                                </tr>
+                                <!-- Tiết 3 & 4 Chiều -->
+                                <tr class="align-top">
+                                    <td class="p-1.5 border-r border-gray-100">
+                                        <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
+                                            <span>TABN</span>
+                                            <span class="text-[10px] opacity-75 mt-0.5">3:15 - 4:45</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-1.5 border-r border-gray-100">
+                                        <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
+                                            <span>IC3</span>
+                                            <span class="text-[10px] opacity-75 mt-0.5">3:15 - 4:45</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-1.5 border-r border-gray-100 space-y-1">
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
+                                            <span>Toán</span>
+                                        </div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
+                                            <span>STEM</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-1.5 border-r border-gray-100 space-y-1">
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
+                                            <span>LS - ĐL</span>
+                                        </div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
+                                            <span>A.I</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-1.5 space-y-1">
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
+                                            <span>Mĩ Thuật</span>
+                                        </div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
+                                            <span>Âm Nhạc</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 6. ĐỔI MẬT KHẨU -->
                 <div id="changepass-screen" class="hidden space-y-3">
-                    <h2 class="text-sm font-semibold text-diary-text border-b border-gray-100 pb-2">Đổi mật khẩu</h2>
-                    <input type="password" id="old-pass" placeholder="Mật khẩu hiện tại" 
+                    <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                        <h2 class="text-sm font-semibold text-diary-text">Đổi mã PIN</h2>
+                    </div>
+                    <input type="password" id="old-pass" placeholder="Mã PIN hiện tại (3 số)" maxlength="3"
                         class="w-full px-4 py-2.5 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text text-sm">
-                    <input type="password" id="new-pass" placeholder="Mật khẩu mới" 
+                    <input type="password" id="new-pass" placeholder="Mã PIN mới (3 số)" maxlength="3"
                         class="w-full px-4 py-2.5 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text text-sm">
                     <div class="flex space-x-3 pt-1">
-                        <button onclick="backToMain()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-sm">Hủy</button>
+                        <button onclick="goToMain()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-sm">Hủy</button>
                         <button onclick="updatePassword()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">Cập nhật</button>
                     </div>
                     <p id="changepass-status" class="text-center text-xs font-medium h-3"></p>
                 </div>
             </div>
 
-            <!-- CỘT PHẢI (SIDEBAR CÀI ĐẶT & THẺ ĐỘNG LỰC) -->
+            <!-- CỘT PHẢI (SIDEBAR CÀI ĐẶT & TIỆN ÍCH) -->
             <div class="md:col-span-1 bg-gray-50 p-4 sm:p-5 rounded-2xl border border-gray-100 flex flex-col justify-between space-y-5">
                 <div class="space-y-3">
-                    <h3 class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Cài đặt & Tài khoản</h3>
+                    <h3 class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Cài đặt & Tiện ích</h3>
                     
                     <div class="space-y-2">
+                        <button onclick="showArchiveScreen()" class="w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-diary-text hover:border-diary-blue/50 hover:text-diary-blue transition flex items-center justify-between">
+                            <span>📦 Kho tàng ký ức</span>
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                        </button>
+                        <button onclick="showTimetableScreen()" class="w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-diary-text hover:border-diary-blue/50 hover:text-diary-blue transition flex items-center justify-between">
+                            <span>📅 Thời khóa biểu</span>
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        </button>
                         <button onclick="showChangePassScreen()" class="w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-diary-text hover:border-diary-blue/50 hover:text-diary-blue transition flex items-center justify-between">
-                            <span>Đổi mật khẩu</span>
+                            <span>Đổi mã PIN</span>
                             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 0121 9z"></path></svg>
                         </button>
                         <button onclick="lockDiary()" class="w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-red-500 hover:bg-red-50 hover:border-red-200 transition flex items-center justify-between">
@@ -166,7 +389,6 @@
                     </div>
                 </div>
 
-                <!-- THẺ CÂU NÓI ĐỘNG LỰC BẢN THÂN MỖI NGÀY -->
                 <div class="p-3.5 bg-white border border-diary-blue/20 rounded-2xl shadow-sm space-y-2">
                     <div class="flex items-center space-x-1.5 text-diary-blue font-semibold text-xs">
                         <span>✨</span>
@@ -183,12 +405,14 @@
 
     <!-- MODAL XÁC NHẬN MẬT KHẨU KHI SỬA / XÓA -->
     <div id="auth-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4 shadow-xl border border-gray-100">
-            <h3 id="auth-modal-title" class="text-sm font-semibold text-diary-text text-center">Xác nhận mật khẩu để tiếp tục</h3>
-            <input type="password" id="auth-password-input" placeholder="Nhập mật khẩu..." 
-                onkeydown="if(event.key==='Enter') verifyAuthAction()"
-                class="w-full px-4 py-2.5 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text text-sm">
-            <div class="flex space-x-3">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4 shadow-xl border border-gray-100 text-center">
+            <h3 id="auth-modal-title" class="text-sm font-semibold text-diary-text">Xác nhận mã PIN để tiếp tục</h3>
+            <div class="flex justify-center space-x-3">
+                <input type="password" maxlength="1" class="auth-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text" oninput="moveAuthNext(this, 1)">
+                <input type="password" maxlength="1" class="auth-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text" oninput="moveAuthNext(this, 2)">
+                <input type="password" maxlength="1" class="auth-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text" oninput="moveAuthNext(this, 3)">
+            </div>
+            <div class="flex space-x-3 pt-2">
                 <button onclick="closeAuthModal()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-sm">Hủy</button>
                 <button onclick="verifyAuthAction()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">Xác nhận</button>
             </div>
@@ -202,12 +426,20 @@
         const mainScreen = document.getElementById('main-screen');
         const viewScreen = document.getElementById('view-screen');
         const editorScreen = document.getElementById('editor-screen');
+        const archiveScreen = document.getElementById('archive-screen');
+        const timetableScreen = document.getElementById('timetable-screen');
         const changepassScreen = document.getElementById('changepass-screen');
-        const passwordInput = document.getElementById('password-input');
+        
         const diaryList = document.getElementById('diary-list');
-        const searchInput = document.getElementById('search-input');
+        const archiveList = document.getElementById('archive-list');
+        const archiveSearchInput = document.getElementById('archive-search-input');
+        const currentWeekLabel = document.getElementById('current-week-label');
+        
         const entryDate = document.getElementById('entry-date');
         const entryContent = document.getElementById('entry-content');
+        const spotifyLinkInput = document.getElementById('spotify-link-input');
+        const spotifyPlayerContainer = document.getElementById('spotify-player-container');
+        const spotifyIframe = document.getElementById('spotify-iframe');
         const viewDateTitle = document.getElementById('view-date-title');
         const viewMood = document.getElementById('view-mood');
         const viewContent = document.getElementById('view-content');
@@ -230,24 +462,82 @@
             '"Niềm tin vào bản thân là chìa khóa mở mọi cánh cửa thành công."'
         ];
 
+        // Tự động chọn (focus) vào ô mã PIN đầu tiên ngay khi tải trang
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const firstPin = document.querySelectorAll('.pin-box')[0];
+                if (firstPin) firstPin.focus();
+            }, 100);
+        });
+
         function getRandomQuote() {
             const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
             dailyQuoteEl.innerText = motivationalQuotes[randomIndex];
         }
 
+        function moveToNext(el, boxNum) {
+            if (el.value.length === 1 && boxNum < 3) {
+                document.querySelectorAll('.pin-box')[boxNum].focus();
+            }
+            if (boxNum === 3 && el.value.length === 1) {
+                handleUnlock();
+            }
+        }
+
+        function handlePinKey(e, index) {
+            let boxes = document.querySelectorAll('.pin-box');
+            if (e.key === 'Backspace' && !boxes[index].value && index > 0) {
+                boxes[index - 1].focus();
+            } else if (e.key === 'Enter') {
+                handleUnlock();
+            }
+        }
+
+        function moveAuthNext(el, boxNum) {
+            if (el.value.length === 1 && boxNum < 3) {
+                document.querySelectorAll('.auth-pin')[boxNum].focus();
+            }
+            if (boxNum === 3 && el.value.length === 1) {
+                verifyAuthAction();
+            }
+        }
+
+        function getPinValue(selector) {
+            let boxes = document.querySelectorAll(selector);
+            let pin = '';
+            boxes.forEach(b => pin += b.value);
+            return pin;
+        }
+
+        function clearPins(selector) {
+            document.querySelectorAll(selector).forEach(b => b.value = '');
+        }
+
+        function getSpotifyEmbedUrl(url) {
+            if (!url) return '';
+            try {
+                let match = url.match(/spotify\.com\/(?:[a-zA-Z0-9_-]+\/)?(track|album|playlist)\/([a-zA-Z0-9]+)/);
+                if (match && match[1] && match[2]) {
+                    return `https://open.spotify.com/embed/${match[1]}/${match[2]}`;
+                }
+            } catch (e) {}
+            return '';
+        }
+
         function handleUnlock() {
-            const enteredPass = passwordInput.value;
-            if (!enteredPass) { alert('Vui lòng nhập mật khẩu!'); return; }
-            const savedPass = localStorage.getItem('diary_password');
+            let enteredPin = getPinValue('.pin-box');
+            if (enteredPin.length < 3) { alert('Vui lòng nhập đủ 3 chữ số mã PIN!'); return; }
+            let savedPass = localStorage.getItem('diary_password');
             if (!savedPass) {
-                localStorage.setItem('diary_password', enteredPass);
+                localStorage.setItem('diary_password', enteredPin);
                 goToMain();
             } else {
-                if (enteredPass === savedPass) {
+                if (enteredPin === savedPass) {
                     goToMain();
                 } else {
-                    alert('Mật khẩu không đúng!');
-                    passwordInput.value = '';
+                    alert('Mã PIN không đúng!');
+                    clearPins('.pin-box');
+                    document.querySelectorAll('.pin-box')[0].focus();
                 }
             }
         }
@@ -257,71 +547,134 @@
             appContainer.classList.remove('hidden');
             viewScreen.classList.add('hidden');
             editorScreen.classList.add('hidden');
+            archiveScreen.classList.add('hidden');
+            timetableScreen.classList.add('hidden');
             changepassScreen.classList.add('hidden');
             mainScreen.classList.remove('hidden');
-            searchInput.value = '';
             getRandomQuote();
-            loadDiaryList();
+            loadCurrentWeekDiary();
         }
 
         function lockDiary() {
             appContainer.classList.add('hidden');
             lockScreen.classList.remove('hidden');
-            passwordInput.value = '';
+            clearPins('.pin-box');
+            setTimeout(() => {
+                document.querySelectorAll('.pin-box')[0].focus();
+            }, 100);
         }
 
-        function loadDiaryList() {
+        function getCurrentWeekRange() {
+            let now = new Date();
+            let day = now.getDay();
+            let diffToMonday = now.getDate() - day + (day === 0 ? -6 : 1);
+            let monday = new Date(now.setDate(diffToMonday));
+            monday.setHours(0, 0, 0, 0);
+            let sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            sunday.setHours(23, 59, 59, 999);
+            return { monday, sunday };
+        }
+
+        function loadCurrentWeekDiary() {
             diaryList.innerHTML = '';
             let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
-            let keyword = searchInput.value.toLowerCase().trim();
             let dates = Object.keys(entries).sort().reverse();
-
-            entryCountBadge.innerText = `${dates.length} bài viết`;
             
-            let filteredDates = dates.filter(date => {
-                let entryData = entries[date];
-                let content = (typeof entryData === 'object' && entryData !== null) ? (entryData.content || '') : entryData;
-                
-                let dateObj = new Date(date + 'T00:00:00'); 
-                let formattedDateStr = dateObj.toLocaleDateString('vi-VN');
-                
-                let fullWeekdayStr = dateObj.toLocaleDateString('vi-VN', { weekday: 'long' }).toLowerCase();
-                let shortWeekdayStr = dateObj.toLocaleDateString('vi-VN', { weekday: 'short' }).toLowerCase();
+            let { monday, sunday } = getCurrentWeekRange();
+            currentWeekLabel.innerText = `${monday.toLocaleDateString('vi-VN')} - ${sunday.toLocaleDateString('vi-VN')}`;
 
-                let isMatchContent = content.toLowerCase().includes(keyword);
-                let isMatchDate = formattedDateStr.includes(keyword) || date.includes(keyword);
-                let isMatchWeekday = fullWeekdayStr.includes(keyword) || shortWeekdayStr.includes(keyword);
-
-                return isMatchContent || isMatchDate || isMatchWeekday;
+            let weekDates = dates.filter(date => {
+                let d = new Date(date + 'T00:00:00');
+                return d >= monday && d <= sunday;
             });
 
-            if (filteredDates.length === 0) {
-                diaryList.innerHTML = '<p class="text-center text-gray-400 py-4 text-xs">Không tìm thấy bài nhật ký nào.</p>';
+            entryCountBadge.innerText = `${weekDates.length} bài tuần này`;
+
+            if (weekDates.length === 0) {
+                diaryList.innerHTML = '<p class="text-center text-gray-400 py-4 text-xs">Tuần này chưa có bài nhật ký nào.</p>';
                 return;
             }
 
-            filteredDates.forEach(date => {
-                let entryData = entries[date];
-                let moodIcon = (typeof entryData === 'object' && entryData !== null && entryData.mood) ? entryData.mood : '';
-                let div = document.createElement('div');
-                div.className = "flex justify-between items-center p-3 bg-gray-50 border border-gray-100 rounded-xl hover:bg-gray-100/80 transition";
-                
-                let dateObj = new Date(date + 'T00:00:00');
-                let formattedDate = dateObj.toLocaleDateString('vi-VN', { weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric' });
-                
-                div.innerHTML = `
-                    <div class="flex items-center space-x-2.5 overflow-hidden">
-                        <span class="text-base">${moodIcon}</span>
-                        <span class="font-medium text-diary-text text-xs sm:text-sm truncate">${formattedDate}</span>
-                    </div>
-                    <div class="space-x-1 text-xs flex items-center shrink-0">
-                        <button onclick="openView('${date}')" class="px-2.5 py-1 bg-diary-blue/10 text-diary-blue font-medium rounded-lg hover:bg-diary-blue/20 transition">Xem</button>
-                        <button onclick="requestEdit('${date}')" class="px-2.5 py-1 bg-gray-200 text-diary-text font-medium rounded-lg hover:bg-gray-300 transition">Sửa</button>
-                        <button onclick="requestDelete('${date}')" class="px-2.5 py-1 bg-red-50 text-red-500 font-medium rounded-lg hover:bg-red-100 transition">Xóa</button>
-                    </div>
-                `;
-                diaryList.appendChild(div);
+            weekDates.forEach(date => {
+                renderDiaryItem(date, entries[date], diaryList);
             });
+        }
+
+        function loadArchiveList() {
+            archiveList.innerHTML = '';
+            let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
+            let keyword = archiveSearchInput.value.toLowerCase().trim();
+            let dates = Object.keys(entries).sort().reverse();
+
+            let filteredDates = dates.filter(date => {
+                let entryData = entries[date];
+                let content = (typeof entryData === 'object' && entryData !== null) ? (entryData.content || '') : entryData;
+                let dateObj = new Date(date + 'T00:00:00');
+                let formattedDateStr = dateObj.toLocaleDateString('vi-VN');
+                let fullWeekdayStr = dateObj.toLocaleDateString('vi-VN', { weekday: 'long' }).toLowerCase();
+                let shortWeekdayStr = dateObj.toLocaleDateString('vi-VN', { weekday: 'short' }).toLowerCase();
+
+                return content.toLowerCase().includes(keyword) || formattedDateStr.includes(keyword) || date.includes(keyword) || fullWeekdayStr.includes(keyword) || shortWeekdayStr.includes(keyword);
+            });
+
+            if (filteredDates.length === 0) {
+                archiveList.innerHTML = '<p class="text-center text-gray-400 py-4 text-xs">Không tìm thấy bài nhật ký cũ nào.</p>';
+                return;
+            }
+
+            let weeksMap = {};
+            filteredDates.forEach(date => {
+                let d = new Date(date + 'T00:00:00');
+                let day = d.getDay();
+                let diffToMonday = d.getDate() - day + (day === 0 ? -6 : 1);
+                let monday = new Date(new Date(d).setDate(diffToMonday));
+                let sunday = new Date(monday);
+                sunday.setDate(monday.getDate() + 6);
+                
+                let weekKey = `${monday.toLocaleDateString('vi-VN')} đến ${sunday.toLocaleDateString('vi-VN')}`;
+                if (!weeksMap[weekKey]) weeksMap[weekKey] = [];
+                weeksMap[weekKey].push(date);
+            });
+
+            Object.keys(weeksMap).forEach(weekKey => {
+                let groupDiv = document.createElement('div');
+                groupDiv.className = "space-y-1.5";
+                groupDiv.innerHTML = `<div class="text-xs font-bold text-diary-blue bg-blue-50 px-3 py-1 rounded-lg">📅 Tuần: ${weekKey}</div>`;
+                
+                let itemsContainer = document.createElement('div');
+                itemsContainer.className = "space-y-2 pl-2";
+                
+                weeksMap[weekKey].forEach(date => {
+                    renderDiaryItem(date, entries[date], itemsContainer);
+                });
+                
+                groupDiv.appendChild(itemsContainer);
+                archiveList.appendChild(groupDiv);
+            });
+        }
+
+        function renderDiaryItem(date, entryData, container) {
+            let moodIcon = (typeof entryData === 'object' && entryData !== null && entryData.mood) ? entryData.mood : '';
+            let hasMusic = (typeof entryData === 'object' && entryData.spotify) ? '🎵 ' : '';
+            let div = document.createElement('div');
+            div.className = "flex justify-between items-center p-3 bg-gray-50 border border-gray-100 rounded-xl hover:bg-gray-100/80 transition";
+            
+            let dateObj = new Date(date + 'T00:00:00');
+            let formattedDate = dateObj.toLocaleDateString('vi-VN', { weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric' });
+            
+            div.innerHTML = `
+                <div class="flex items-center space-x-2.5 overflow-hidden">
+                    <span class="text-base">${moodIcon}</span>
+                    <span class="font-medium text-diary-text text-xs sm:text-sm truncate">${hasMusic}${formattedDate}</span>
+                </div>
+                <div class="space-x-1 text-xs flex items-center shrink-0">
+                    <button onclick="openView('${date}')" class="px-2.5 py-1 bg-diary-blue/10 text-diary-blue font-medium rounded-lg hover:bg-diary-blue/20 transition">Xem</button>
+                    <button onclick="requestEdit('${date}')" class="px-2.5 py-1 bg-gray-200 text-diary-text font-medium rounded-lg hover:bg-gray-300 transition">Sửa</button>
+                    <button onclick="requestDelete('${date}')" class="px-2.5 py-1 bg-red-50 text-red-500 font-medium rounded-lg hover:bg-red-100 transition">Xóa</button>
+                </div>
+            `;
+            container.appendChild(div);
         }
 
         function setMood(mood) {
@@ -345,11 +698,16 @@
         function openView(date) {
             currentActiveDate = date;
             mainScreen.classList.add('hidden');
+            archiveScreen.classList.add('hidden');
+            timetableScreen.classList.add('hidden');
+            editorScreen.classList.add('hidden');
             viewScreen.classList.remove('hidden');
+            
             let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
             let entryData = entries[date];
             let contentText = typeof entryData === 'object' ? entryData.content : entryData;
             let moodIcon = (typeof entryData === 'object' && entryData.mood) ? entryData.mood : '';
+            let spotifyUrl = (typeof entryData === 'object' && entryData.spotify) ? entryData.spotify : '';
             
             let dateObj = new Date(date + 'T00:00:00');
             let formattedDate = dateObj.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -357,6 +715,15 @@
             viewMood.innerText = moodIcon;
             viewDateTitle.innerText = `Ngày ${formattedDate}`;
             viewContent.innerText = contentText || 'Không có nội dung.';
+
+            let embedUrl = getSpotifyEmbedUrl(spotifyUrl);
+            if (embedUrl) {
+                spotifyIframe.src = embedUrl;
+                spotifyPlayerContainer.classList.remove('hidden');
+            } else {
+                spotifyPlayerContainer.classList.add('hidden');
+                spotifyIframe.src = '';
+            }
         }
 
         function switchToEditFromView() {
@@ -366,21 +733,21 @@
         function requestEdit(date) {
             pendingAction = 'edit';
             pendingDate = date;
-            showAuthModal('Nhập mật khẩu để chỉnh sửa bài nhật ký');
+            showAuthModal('Nhập mã PIN để chỉnh sửa bài nhật ký');
         }
 
         function requestDelete(date) {
             pendingAction = 'delete';
             pendingDate = date;
-            showAuthModal('Nhập mật khẩu để xóa bài nhật ký');
+            showAuthModal('Nhập mã PIN để xóa bài nhật ký');
         }
 
         function showAuthModal(title) {
             document.getElementById('auth-modal-title').innerText = title;
-            document.getElementById('auth-password-input').value = '';
+            clearPins('.auth-pin');
             document.getElementById('auth-status').innerText = '';
             document.getElementById('auth-modal').classList.remove('hidden');
-            document.getElementById('auth-password-input').focus();
+            document.querySelectorAll('.auth-pin')[0].focus();
         }
 
         function closeAuthModal() {
@@ -390,21 +757,16 @@
         }
 
         function verifyAuthAction() {
-            let enteredPass = document.getElementById('auth-password-input').value;
+            let enteredPin = getPinValue('.auth-pin');
             let savedPass = localStorage.getItem('diary_password');
             let statusEl = document.getElementById('auth-status');
-            if (!enteredPass) {
-                statusEl.innerText = 'Vui lòng nhập mật khẩu!';
+            if (enteredPin.length < 3) {
+                statusEl.innerText = 'Vui lòng nhập đủ 3 số!';
                 return;
             }
-            if (!savedPass) {
-                localStorage.setItem('diary_password', enteredPass);
-                savedPass = enteredPass;
-            }
-            if (enteredPass === savedPass) {
+            if (enteredPin === savedPass) {
                 let action = pendingAction;
                 let dateToProcess = pendingDate;
-                
                 closeAuthModal();
                 if (action === 'edit') {
                     viewScreen.classList.add('hidden');
@@ -413,30 +775,30 @@
                     executeDelete(dateToProcess);
                 }
             } else {
-                statusEl.innerText = 'Mật khẩu không đúng!';
-                document.getElementById('auth-password-input').value = '';
+                statusEl.innerText = 'Mã PIN không đúng!';
+                clearPins('.auth-pin');
+                document.querySelectorAll('.auth-pin')[0].focus();
             }
         }
 
         function openNewEditor() {
             mainScreen.classList.add('hidden');
+            archiveScreen.classList.add('hidden');
             editorScreen.classList.remove('hidden');
             saveStatus.innerText = '';
             
             let today = new Date().toISOString().split('T')[0];
             currentActiveDate = today;
             entryDate.value = today;
+            spotifyLinkInput.value = '';
             
             let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
             let entryData = entries[today];
             
             if (entryData && typeof entryData === 'object') {
                 entryContent.value = entryData.content || '';
-                if (entryData.mood) {
-                    setMood(entryData.mood);
-                } else {
-                    clearMoodSelection();
-                }
+                spotifyLinkInput.value = entryData.spotify || '';
+                if (entryData.mood) setMood(entryData.mood); else clearMoodSelection();
             } else {
                 entryContent.value = entryData || '';
                 clearMoodSelection();
@@ -455,33 +817,33 @@
             let entryData = entries[date];
             if (entryData && typeof entryData === 'object') {
                 entryContent.value = entryData.content || '';
-                if (entryData.mood) {
-                    setMood(entryData.mood);
-                } else {
-                    clearMoodSelection();
-                }
+                spotifyLinkInput.value = entryData.spotify || '';
+                if (entryData.mood) setMood(entryData.mood); else clearMoodSelection();
             } else {
                 entryContent.value = entryData || '';
+                spotifyLinkInput.value = '';
                 clearMoodSelection();
             }
-        }
-
-        function backToMain() {
-            goToMain();
         }
 
         function saveEntry() {
             let dateVal = entryDate.value;
             let contentVal = entryContent.value;
+            let spotifyVal = spotifyLinkInput.value.trim();
             if (!dateVal) { alert('Vui lòng chọn ngày!'); return; }
             let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
             entries[dateVal] = {
                 content: contentVal,
-                mood: selectedMood || ''
+                mood: selectedMood || '',
+                spotify: spotifyVal
             };
             localStorage.setItem('diary_entries', JSON.stringify(entries));
-            saveStatus.innerText = 'Đã lưu thành công';
-            setTimeout(() => { saveStatus.innerText = ''; }, 2000);
+            saveStatus.innerText = 'Đã lưu thành công!';
+            
+            setTimeout(() => {
+                editorScreen.classList.add('hidden');
+                openView(dateVal);
+            }, 800);
         }
 
         function executeDelete(date) {
@@ -489,14 +851,38 @@
                 let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
                 delete entries[date];
                 localStorage.setItem('diary_entries', JSON.stringify(entries));
-                loadDiaryList();
+                loadCurrentWeekDiary();
+                loadArchiveList();
+                goToMain();
             }
+        }
+
+        function showArchiveScreen() {
+            mainScreen.classList.add('hidden');
+            viewScreen.classList.add('hidden');
+            editorScreen.classList.add('hidden');
+            timetableScreen.classList.add('hidden');
+            changepassScreen.classList.add('hidden');
+            archiveScreen.classList.remove('hidden');
+            archiveSearchInput.value = '';
+            loadArchiveList();
+        }
+
+        function showTimetableScreen() {
+            mainScreen.classList.add('hidden');
+            viewScreen.classList.add('hidden');
+            editorScreen.classList.add('hidden');
+            archiveScreen.classList.add('hidden');
+            changepassScreen.classList.add('hidden');
+            timetableScreen.classList.remove('hidden');
         }
 
         function showChangePassScreen() {
             mainScreen.classList.add('hidden');
             viewScreen.classList.add('hidden');
             editorScreen.classList.add('hidden');
+            archiveScreen.classList.add('hidden');
+            timetableScreen.classList.add('hidden');
             changepassScreen.classList.remove('hidden');
             document.getElementById('old-pass').value = '';
             document.getElementById('new-pass').value = '';
@@ -510,17 +896,17 @@
             let savedPass = localStorage.getItem('diary_password');
             if (oldPass !== savedPass) {
                 statusText.className = "text-center text-xs font-medium text-red-500 h-3";
-                statusText.innerText = 'Mật khẩu hiện tại không đúng!';
+                statusText.innerText = 'Mã PIN hiện tại không đúng!';
                 return;
             }
-            if (!newPass) {
+            if (newPass.length < 3) {
                 statusText.className = "text-center text-xs font-medium text-red-500 h-3";
-                statusText.innerText = 'Vui lòng nhập đúng mật khẩu mới!';
+                statusText.innerText = 'Mã PIN mới phải có đủ 3 chữ số!';
                 return;
             }
             localStorage.setItem('diary_password', newPass);
             statusText.className = "text-center text-xs font-medium text-diary-blue h-3";
-            statusText.innerText = 'Đổi mật khẩu thành công!';
+            statusText.innerText = 'Đổi mã PIN thành công!';
             setTimeout(() => { goToMain(); }, 1500);
         }
     </script>
