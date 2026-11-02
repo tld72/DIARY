@@ -3,25 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DIARY</title>
-    <!-- 1. ICON TRÊN TAB TRÌNH DUYỆT WEB -->
+    <title>tld</title>
+    <!-- ICON TRÊN TAB TRÌNH DUYỆT WEB -->
     <link rel="icon" type="image/png" href="https://cdn.phototourl.com/member/2026-11-01-4ccc1fd3-8c03-4211-b027-4f6c30fccfdc.png">
     <link rel="apple-touch-icon" href="https://cdn.phototourl.com/member/2026-11-01-4ccc1fd3-8c03-4211-b027-4f6c30fccfdc.png">
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,{
-        %22name%22: %22DIARY%22,
-        %22short_name%22: %22DIARY%22,
-        %22start_url%22: %22.%22,
-        %22display%22: %22standalone%22,
-        %22background_color%22: %22%23F2F9F5%22,
-        %22theme_color%22: %22%230056A3%22,
-        %22icons%22: [
-            {
-                %22src%22: %22https://cdn.phototourl.com/member/2026-11-01-4ccc1fd3-8c03-4211-b027-4f6c30fccfdc.png%22,
-                %22sizes%22: %22512x512%22,
-                %22type%22: %22image/png%22
-            }
-        ]
-    }">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -33,25 +18,89 @@
                         'diary-blue': '#0056A3',    
                         'diary-text': '#4B5563',    
                         'diary-border': '#E5E7EB',
-                        'spotify-green': '#1DB954'
+                        'spotify-green': '#1DB954',
+                        'brand-cyan': '#53D2DC'
                     }
                 }
             }
         }
     </script>
+    <style>
+        /* Hiệu ứng xoay 3D cho Flashcard */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+        
+        /* Animation trượt thanh tiến trình 1 giây */
+        @keyframes loadingProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+        .animate-progress {
+            animation: loadingProgress 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        
+        /* Animation lật thẻ 1 giây */
+        @keyframes flipCardAnimation {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(180deg); }
+        }
+        .animate-flip-card {
+            animation: flipCardAnimation 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+    </style>
 </head>
-<body class="bg-diary-bg h-screen w-screen overflow-hidden flex items-center justify-center p-3 sm:p-6 font-sans">
+<body class="bg-diary-bg h-screen w-screen overflow-hidden flex items-center justify-center p-3 sm:p-6 font-sans relative">
     
-    <!-- MÀN HÌNH KHÓA BAN ĐẦU -->
-    <div id="lock-screen" class="w-full sm:max-w-xl bg-white sm:rounded-3xl shadow-xl p-6 sm:p-10 space-y-6 border border-gray-100 text-center">
-        <h1 class="text-2xl sm:text-3xl font-bold text-diary-blue tracking-wide cursor-pointer">DIARY</h1>
+    <!-- 0. MÀN HÌNH SPLASH SCREEN FLASHCARD -->
+    <div id="splash-screen" class="fixed inset-0 bg-diary-bg z-50 flex flex-col items-center justify-center p-4 transition-opacity duration-500">
+        
+        <!-- Flashcard 3D Container -->
+        <div class="perspective-1000 w-72 h-44 sm:w-80 sm:h-48 mb-8">
+            <div id="flashcard" class="transform-style-3d animate-flip-card w-full h-full relative rounded-3xl shadow-xl border border-gray-100 bg-white">
+                
+                <!-- MẶT TRƯỚC (Front) -->
+                <div class="backface-hidden absolute inset-0 w-full h-full flex items-center justify-center rounded-3xl bg-white p-6">
+                    <h1 class="text-4xl font-bold text-[#53D2DC] tracking-wide">tld</h1>
+                </div>
+
+                <!-- MẶT SAU (Back) -->
+                <div class="backface-hidden rotate-y-180 absolute inset-0 w-full h-full flex flex-col items-center justify-center rounded-3xl bg-white p-4 space-y-3">
+                    <!-- Logo sách & kính (Đã phóng to cân đối) -->
+                    <img src="https://cdn.phototourl.com/member/2026-11-01-4ccc1fd3-8c03-4211-b027-4f6c30fccfdc.png" alt="Logo" class="w-20 h-20 sm:w-24 sm:h-24 object-contain">
+                    <!-- Slogan -->
+                    <p class="text-xs sm:text-sm font-semibold text-diary-text tracking-widest uppercase">Your Days · Your Story</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Thanh trượt tiến trình (Progress Bar - 1s) -->
+        <div class="w-48 sm:w-56 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+            <div class="h-full bg-[#53D2DC] rounded-full animate-progress"></div>
+        </div>
+    </div>
+
+    <!-- 1. MÀN HÌNH KHÓA BAN ĐẦU -->
+    <div id="lock-screen" class="hidden w-full sm:max-w-xl bg-white sm:rounded-3xl shadow-xl p-6 sm:p-10 space-y-6 border border-gray-100 text-center">
+        <h1 class="text-3xl sm:text-4xl font-bold text-[#53D2DC] tracking-wide">tld</h1>
         <p id="lock-message" class="text-diary-text text-sm sm:text-base font-medium">Nhập mã PIN</p>
         
         <!-- 3 Ô GÕ PIN -->
         <div class="flex justify-center space-x-3">
-            <input type="password" maxlength="1" class="pin-box w-14 h-14 text-center text-2xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text" oninput="moveToNext(this, 1)" onkeydown="handlePinKey(event, 0)">
-            <input type="password" maxlength="1" class="pin-box w-14 h-14 text-center text-2xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text" oninput="moveToNext(this, 2)" onkeydown="handlePinKey(event, 1)">
-            <input type="password" maxlength="1" class="pin-box w-14 h-14 text-center text-2xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text" oninput="moveToNext(this, 3)" onkeydown="handlePinKey(event, 2)">
+            <input type="password" maxlength="1" class="pin-box w-14 h-14 text-center text-2xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveToNext(this, 1)" onkeydown="handlePinKey(event, 0)">
+            <input type="password" maxlength="1" class="pin-box w-14 h-14 text-center text-2xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveToNext(this, 2)" onkeydown="handlePinKey(event, 1)">
+            <input type="password" maxlength="1" class="pin-box w-14 h-14 text-center text-2xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveToNext(this, 3)" onkeydown="handlePinKey(event, 2)">
         </div>
 
         <button onclick="handleUnlock()" 
@@ -61,21 +110,21 @@
     </div>
 
     <!-- KHUNG GIAO DIỆN CHÍNH -->
-    <div id="app-container" class="hidden w-full max-h-[95vh] sm:max-w-5xl bg-white sm:rounded-3xl shadow-xl overflow-hidden border border-gray-100 p-5 sm:p-7 flex flex-col justify-between">
+    <div id="app-container" class="hidden w-full max-h-[95vh] sm:max-w-5xl bg-white sm:rounded-3xl shadow-xl overflow-hidden border border-gray-100 p-5 sm:p-7 flex flex-col justify-between z-10">
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
             
-            <!-- CỘT TRÁI (2/3 KHÔNG GIAN CHO NỘI DUNG CHÍNH) -->
+            <!-- CỘT TRÁI (2/3 KHÔNG GIAN NỘI DUNG CHÍNH) -->
             <div class="md:col-span-2 space-y-4">
                 <div class="flex justify-between items-center pb-2 border-b border-gray-100">
-                    <h1 onclick="goToMain()" class="text-xl font-bold text-diary-blue tracking-wide cursor-pointer hover:opacity-80 transition">DIARY</h1>
+                    <h1 onclick="goToMain()" class="text-2xl font-bold text-[#53D2DC] tracking-wide cursor-pointer hover:opacity-80 transition">tld</h1>
                     <span id="entry-count-badge" class="text-xs bg-diary-blue/10 text-diary-blue px-3 py-1 rounded-full font-medium"></span>
                 </div>
 
                 <!-- 1. MÀN HÌNH CHÍNH (Nhật ký tuần này) -->
                 <div id="main-screen" class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold text-diary-blue uppercase tracking-wider">✨ Nhật ký tuần này</span>
+                        <span class="text-xs font-semibold text-diary-blue uppercase tracking-wider">Nhật ký tuần này</span>
                         <span id="current-week-label" class="text-xs text-gray-400"></span>
                     </div>
 
@@ -146,10 +195,10 @@
                     <p id="save-status" class="text-center text-xs text-diary-blue h-3 font-medium"></p>
                 </div>
 
-                <!-- 4. KHO TẢNG KÝ ỨC (Lưu trữ chia theo tuần) -->
+                <!-- 4. KHO TẢNG KÝ ỨC -->
                 <div id="archive-screen" class="hidden space-y-3">
                     <div class="flex justify-between items-center border-b border-gray-100 pb-2">
-                        <h2 class="text-sm font-semibold text-diary-blue">📦 Kho tàng ký ức (Phân theo tuần)</h2>
+                        <h2 class="text-sm font-semibold text-diary-blue">Kho tàng ký ức (Phân theo tuần)</h2>
                     </div>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
@@ -159,14 +208,28 @@
                             class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-diary-border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text">
                     </div>
                     <div id="archive-list" class="space-y-4 max-h-[260px] sm:max-h-[280px] overflow-y-auto pr-1">
-                        <!-- Danh sách lưu trữ phân theo tuần -->
+                        <!-- Danh sách lưu trữ -->
                     </div>
                 </div>
 
-                <!-- 5. THỜI KHÓA BIỂU ĐÚNG CHUẨN MỚI (1 Ô TO = 2 Ô NHỎ, KHÔNG GIỜ VÀO RA CHƠI / ĂN TRƯA) -->
+                <!-- 5. LỊCH NGỌT NGÀO -->
+                <div id="calendar-screen" class="hidden space-y-3">
+                    <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                        <h2 class="text-sm font-semibold text-diary-blue">Lịch ngọt ngào</h2>
+                        <span id="calendar-month-year" class="text-xs font-bold text-gray-500"></span>
+                    </div>
+                    <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold text-gray-400 pb-1">
+                        <div>T2</div><div>T3</div><div>T4</div><div>T5</div><div>T6</div><div>T7</div><div>CN</div>
+                    </div>
+                    <div id="calendar-grid" class="grid grid-cols-7 gap-1.5 max-h-[260px] overflow-y-auto p-1">
+                        <!-- Ô ngày lịch -->
+                    </div>
+                </div>
+
+                <!-- 6. THỜI KHÓA BIỂU -->
                 <div id="timetable-screen" class="hidden space-y-3">
                     <div class="flex justify-between items-center border-b border-gray-100 pb-2">
-                        <h2 class="text-sm font-semibold text-diary-blue">📅 Thời khóa biểu lớp 7</h2>
+                        <h2 class="text-sm font-semibold text-diary-blue">Thời khóa biểu lớp 7</h2>
                     </div>
                     <div class="max-h-[310px] overflow-y-auto pr-1">
                         <table class="w-full text-left text-[11px] border-collapse">
@@ -180,7 +243,6 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100 text-diary-text">
-                                <!-- Tiết 1 & 2 Sáng -->
                                 <tr class="align-top">
                                     <td class="p-1.5 border-r border-gray-100">
                                         <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
@@ -189,28 +251,16 @@
                                         </div>
                                     </td>
                                     <td class="p-1.5 border-r border-gray-100 space-y-1">
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
-                                            <span>KHTN</span>
-                                        </div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
-                                            <span>Ngoại Ngữ</span>
-                                        </div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>KHTN</span></div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Ngoại Ngữ</span></div>
                                     </td>
                                     <td class="p-1.5 border-r border-gray-100 space-y-1">
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
-                                            <span>Công Nghệ</span>
-                                        </div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
-                                            <span>GDĐP</span>
-                                        </div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Công Nghệ</span></div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>GDĐP</span></div>
                                     </td>
                                     <td class="p-1.5 border-r border-gray-100 space-y-1">
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
-                                            <span>HĐTN</span>
-                                        </div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
-                                            <span>KHTN</span>
-                                        </div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>HĐTN</span></div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>KHTN</span></div>
                                     </td>
                                     <td class="p-1.5">
                                         <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
@@ -219,11 +269,9 @@
                                         </div>
                                     </td>
                                 </tr>
-                                <!-- Ra chơi -->
                                 <tr class="bg-cyan-50/40">
                                     <td colspan="5" class="p-1 text-center font-medium text-cyan-800 text-[10px]">Ra chơi</td>
                                 </tr>
-                                <!-- Tiết 3 & 4 Sáng -->
                                 <tr class="align-top">
                                     <td class="p-1.5 border-r border-gray-100">
                                         <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
@@ -250,27 +298,17 @@
                                         </div>
                                     </td>
                                     <td class="p-1.5 space-y-1">
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
-                                            <span>Văn</span>
-                                        </div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
-                                            <span>LS - ĐL</span>
-                                        </div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Văn</span></div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>LS - ĐL</span></div>
                                     </td>
                                 </tr>
-                                <!-- Ăn trưa - Ngủ trưa -->
                                 <tr class="bg-gray-50/60">
                                     <td colspan="5" class="p-1.5 text-center font-medium text-gray-600 text-[10px]">Ăn trưa - Ngủ trưa</td>
                                 </tr>
-                                <!-- Tiết 1 & 2 Chiều -->
                                 <tr class="align-top">
                                     <td class="p-1.5 border-r border-gray-100 space-y-1">
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
-                                            <span>Văn</span>
-                                        </div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
-                                            <span>TATC</span>
-                                        </div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Văn</span></div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>TATC</span></div>
                                     </td>
                                     <td class="p-1.5 border-r border-gray-100">
                                         <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
@@ -279,31 +317,21 @@
                                         </div>
                                     </td>
                                     <td class="p-1.5 border-r border-gray-100 space-y-1">
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
-                                            <span>GDCD</span>
-                                        </div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
-                                            <span>Tin</span>
-                                        </div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>GDCD</span></div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Tin</span></div>
                                     </td>
                                     <td class="p-1.5 border-r border-gray-100 space-y-1">
                                         <div class="bg-gray-50 text-gray-400 p-1.5 rounded-lg text-center italic h-[36px] flex flex-col justify-center">Trống</div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
-                                            <span>LS - ĐL</span>
-                                        </div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>LS - ĐL</span></div>
                                     </td>
                                     <td class="p-1.5 space-y-1">
                                         <div class="bg-gray-50 text-gray-400 p-1.5 rounded-lg text-center italic h-[36px] flex flex-col justify-center">Trống</div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
-                                            <span>Toán</span>
-                                        </div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Toán</span></div>
                                     </td>
                                 </tr>
-                                <!-- Ra chơi chiều -->
                                 <tr class="bg-cyan-50/40">
                                     <td colspan="5" class="p-1 text-center font-medium text-cyan-800 text-[10px]">Ra chơi</td>
                                 </tr>
-                                <!-- Tiết 3 & 4 Chiều -->
                                 <tr class="align-top">
                                     <td class="p-1.5 border-r border-gray-100">
                                         <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
@@ -318,28 +346,16 @@
                                         </div>
                                     </td>
                                     <td class="p-1.5 border-r border-gray-100 space-y-1">
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
-                                            <span>Toán</span>
-                                        </div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
-                                            <span>STEM</span>
-                                        </div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Toán</span></div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>STEM</span></div>
                                     </td>
                                     <td class="p-1.5 border-r border-gray-100 space-y-1">
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
-                                            <span>LS - ĐL</span>
-                                        </div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
-                                            <span>A.I</span>
-                                        </div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>LS - ĐL</span></div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>A.I</span></div>
                                     </td>
                                     <td class="p-1.5 space-y-1">
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
-                                            <span>Mĩ Thuật</span>
-                                        </div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center">
-                                            <span>Âm Nhạc</span>
-                                        </div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Mĩ Thuật</span></div>
+                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Âm Nhạc</span></div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -347,7 +363,7 @@
                     </div>
                 </div>
 
-                <!-- 6. ĐỔI MẬT KHẨU -->
+                <!-- 7. ĐỔI MẬT KHẨU -->
                 <div id="changepass-screen" class="hidden space-y-3">
                     <div class="flex justify-between items-center border-b border-gray-100 pb-2">
                         <h2 class="text-sm font-semibold text-diary-text">Đổi mã PIN</h2>
@@ -370,28 +386,26 @@
                     <h3 class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Cài đặt & Tiện ích</h3>
                     
                     <div class="space-y-2">
-                        <button onclick="showArchiveScreen()" class="w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-diary-text hover:border-diary-blue/50 hover:text-diary-blue transition flex items-center justify-between">
-                            <span>📦 Kho tàng ký ức</span>
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                        <button id="nav-archive" onclick="showArchiveScreen()" class="menu-btn w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-diary-text hover:border-[#53D2DC] hover:text-[#53D2DC] transition flex items-center justify-between">
+                            <span>Kho tàng ký ức</span>
                         </button>
-                        <button onclick="showTimetableScreen()" class="w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-diary-text hover:border-diary-blue/50 hover:text-diary-blue transition flex items-center justify-between">
-                            <span>📅 Thời khóa biểu</span>
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <button id="nav-calendar" onclick="showCalendarScreen()" class="menu-btn w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-diary-text hover:border-[#53D2DC] hover:text-[#53D2DC] transition flex items-center justify-between">
+                            <span>Lịch ngọt ngào</span>
                         </button>
-                        <button onclick="showChangePassScreen()" class="w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-diary-text hover:border-diary-blue/50 hover:text-diary-blue transition flex items-center justify-between">
+                        <button id="nav-timetable" onclick="showTimetableScreen()" class="menu-btn w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-diary-text hover:border-[#53D2DC] hover:text-[#53D2DC] transition flex items-center justify-between">
+                            <span>Thời khóa biểu</span>
+                        </button>
+                        <button id="nav-changepass" onclick="showChangePassScreen()" class="menu-btn w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-diary-text hover:border-[#53D2DC] hover:text-[#53D2DC] transition flex items-center justify-between">
                             <span>Đổi mã PIN</span>
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 0121 9z"></path></svg>
                         </button>
                         <button onclick="lockDiary()" class="w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-red-500 hover:bg-red-50 hover:border-red-200 transition flex items-center justify-between">
                             <span>Khóa ứng dụng</span>
-                            <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                         </button>
                     </div>
                 </div>
 
-                <div class="p-3.5 bg-white border border-diary-blue/20 rounded-2xl shadow-sm space-y-2">
-                    <div class="flex items-center space-x-1.5 text-diary-blue font-semibold text-xs">
-                        <span>✨</span>
+                <div class="p-3.5 bg-white border border-[#53D2DC]/30 rounded-2xl shadow-sm space-y-2">
+                    <div class="flex items-center space-x-1.5 text-[#53D2DC] font-semibold text-xs">
                         <span>Động lực mỗi ngày</span>
                     </div>
                     <p id="daily-quote" class="text-xs text-diary-text italic leading-relaxed font-medium">
@@ -403,14 +417,31 @@
         </div>
     </div>
 
+    <!-- MODAL GHI CHÚ CHO LỊCH -->
+    <div id="calendar-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-5 w-full max-w-xs space-y-4 shadow-xl border border-gray-100 text-center">
+            <h3 id="calendar-modal-title" class="text-xs font-bold text-diary-blue">Ghi chú ngày</h3>
+            
+            <div class="space-y-1 text-left">
+                <label class="text-[11px] font-semibold text-gray-500">Nội dung ghi chú:</label>
+                <input type="text" id="calendar-note-input" placeholder="Ví dụ: Kiểm tra 1 tiết Toán..." class="w-full p-2.5 bg-gray-50 border border-diary-border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text">
+            </div>
+
+            <div class="flex space-x-2 pt-1">
+                <button onclick="closeCalendarModal()" class="w-1/2 bg-gray-100 text-diary-text py-2 rounded-xl font-semibold text-xs hover:bg-gray-200 transition">Hủy</button>
+                <button onclick="saveCalendarDayData()" class="w-1/2 bg-diary-blue text-white py-2 rounded-xl font-semibold text-xs hover:bg-blue-900 transition shadow-sm">Lưu ghi chú</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL XÁC NHẬN MẬT KHẨU KHI SỬA / XÓA -->
     <div id="auth-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4 shadow-xl border border-gray-100 text-center">
             <h3 id="auth-modal-title" class="text-sm font-semibold text-diary-text">Xác nhận mã PIN để tiếp tục</h3>
             <div class="flex justify-center space-x-3">
-                <input type="password" maxlength="1" class="auth-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text" oninput="moveAuthNext(this, 1)">
-                <input type="password" maxlength="1" class="auth-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text" oninput="moveAuthNext(this, 2)">
-                <input type="password" maxlength="1" class="auth-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text" oninput="moveAuthNext(this, 3)">
+                <input type="password" maxlength="1" class="auth-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveAuthNext(this, 1)">
+                <input type="password" maxlength="1" class="auth-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveAuthNext(this, 2)">
+                <input type="password" maxlength="1" class="auth-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveAuthNext(this, 3)">
             </div>
             <div class="flex space-x-3 pt-2">
                 <button onclick="closeAuthModal()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-sm">Hủy</button>
@@ -421,12 +452,14 @@
     </div>
 
     <script>
+        const splashScreen = document.getElementById('splash-screen');
         const lockScreen = document.getElementById('lock-screen');
         const appContainer = document.getElementById('app-container');
         const mainScreen = document.getElementById('main-screen');
         const viewScreen = document.getElementById('view-screen');
         const editorScreen = document.getElementById('editor-screen');
         const archiveScreen = document.getElementById('archive-screen');
+        const calendarScreen = document.getElementById('calendar-screen');
         const timetableScreen = document.getElementById('timetable-screen');
         const changepassScreen = document.getElementById('changepass-screen');
         
@@ -451,6 +484,7 @@
         let selectedMood = null;
         let pendingAction = null; 
         let pendingDate = null;
+        let selectedCalDateKey = null;
 
         const motivationalQuotes = [
             '"Hãy kiên trì từng chút một, mỗi ngày bạn viết nên một trang đời rực rỡ."',
@@ -462,17 +496,36 @@
             '"Niềm tin vào bản thân là chìa khóa mở mọi cánh cửa thành công."'
         ];
 
-        // Tự động chọn (focus) vào ô mã PIN đầu tiên ngay khi tải trang
+        // Khởi chạy Splash screen 1s rồi chuyển qua màn hình khóa
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
-                const firstPin = document.querySelectorAll('.pin-box')[0];
-                if (firstPin) firstPin.focus();
-            }, 100);
+                splashScreen.classList.add('opacity-0');
+                setTimeout(() => {
+                    splashScreen.classList.add('hidden');
+                    lockScreen.classList.remove('hidden');
+                    const firstPin = document.querySelectorAll('.pin-box')[0];
+                    if (firstPin) firstPin.focus();
+                }, 500);
+            }, 1000); // 1000ms = 1 giây
         });
 
         function getRandomQuote() {
             const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
             dailyQuoteEl.innerText = motivationalQuotes[randomIndex];
+        }
+
+        function setActiveMenu(menuId) {
+            document.querySelectorAll('.menu-btn').forEach(btn => {
+                btn.classList.remove('bg-[#53D2DC]/10', 'border-[#53D2DC]', 'text-[#53D2DC]', 'font-bold', 'shadow-sm');
+                btn.classList.add('bg-white', 'border-gray-200', 'text-diary-text');
+            });
+            if (menuId) {
+                let activeBtn = document.getElementById(menuId);
+                if (activeBtn) {
+                    activeBtn.classList.remove('bg-white', 'border-gray-200', 'text-diary-text');
+                    activeBtn.classList.add('bg-[#53D2DC]/10', 'border-[#53D2DC]', 'text-[#53D2DC]', 'font-bold', 'shadow-sm');
+                }
+            }
         }
 
         function moveToNext(el, boxNum) {
@@ -548,9 +601,11 @@
             viewScreen.classList.add('hidden');
             editorScreen.classList.add('hidden');
             archiveScreen.classList.add('hidden');
+            calendarScreen.classList.add('hidden');
             timetableScreen.classList.add('hidden');
             changepassScreen.classList.add('hidden');
             mainScreen.classList.remove('hidden');
+            setActiveMenu(null);
             getRandomQuote();
             loadCurrentWeekDiary();
         }
@@ -640,7 +695,7 @@
             Object.keys(weeksMap).forEach(weekKey => {
                 let groupDiv = document.createElement('div');
                 groupDiv.className = "space-y-1.5";
-                groupDiv.innerHTML = `<div class="text-xs font-bold text-diary-blue bg-blue-50 px-3 py-1 rounded-lg">📅 Tuần: ${weekKey}</div>`;
+                groupDiv.innerHTML = `<div class="text-xs font-bold text-diary-blue bg-blue-50 px-3 py-1 rounded-lg">Tuần: ${weekKey}</div>`;
                 
                 let itemsContainer = document.createElement('div');
                 itemsContainer.className = "space-y-2 pl-2";
@@ -699,6 +754,7 @@
             currentActiveDate = date;
             mainScreen.classList.add('hidden');
             archiveScreen.classList.add('hidden');
+            calendarScreen.classList.add('hidden');
             timetableScreen.classList.add('hidden');
             editorScreen.classList.add('hidden');
             viewScreen.classList.remove('hidden');
@@ -784,10 +840,12 @@
         function openNewEditor() {
             mainScreen.classList.add('hidden');
             archiveScreen.classList.add('hidden');
+            calendarScreen.classList.add('hidden');
             editorScreen.classList.remove('hidden');
             saveStatus.innerText = '';
+            setActiveMenu(null);
             
-            let today = new Date().toISOString().split('T')[0];
+            let today = new Date().toLocaleDateString('en-CA');
             currentActiveDate = today;
             entryDate.value = today;
             spotifyLinkInput.value = '';
@@ -808,6 +866,7 @@
         function openEdit(date) {
             mainScreen.classList.add('hidden');
             viewScreen.classList.add('hidden');
+            calendarScreen.classList.add('hidden');
             editorScreen.classList.remove('hidden');
             saveStatus.innerText = '';
             currentActiveDate = date;
@@ -861,11 +920,102 @@
             mainScreen.classList.add('hidden');
             viewScreen.classList.add('hidden');
             editorScreen.classList.add('hidden');
+            calendarScreen.classList.add('hidden');
             timetableScreen.classList.add('hidden');
             changepassScreen.classList.add('hidden');
             archiveScreen.classList.remove('hidden');
             archiveSearchInput.value = '';
+            setActiveMenu('nav-archive');
             loadArchiveList();
+        }
+
+        function showCalendarScreen() {
+            mainScreen.classList.add('hidden');
+            viewScreen.classList.add('hidden');
+            editorScreen.classList.add('hidden');
+            archiveScreen.classList.add('hidden');
+            timetableScreen.classList.add('hidden');
+            changepassScreen.classList.add('hidden');
+            calendarScreen.classList.remove('hidden');
+            setActiveMenu('nav-[#53D2DC]');
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const todayStr = now.toLocaleDateString('en-CA');
+            
+            document.getElementById('calendar-month-year').innerText = `Tháng ${month + 1} / ${year}`;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const calData = JSON.parse(localStorage.getItem('diary_calendar_data')) || {};
+
+            let emptyCells = firstDay === 0 ? 6 : firstDay - 1;
+            for (let i = 0; i < emptyCells; i++) {
+                grid.innerHTML += `<div class="h-12 bg-transparent"></div>`;
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                let monthStr = String(month + 1).padStart(2, '0');
+                let dayStr = String(day).padStart(2, '0');
+                let dateKey = `${year}-${monthStr}-${dayStr}`;
+                
+                let dayData = calData[dateKey] || {};
+                let noteText = dayData.note ? dayData.note : '';
+                let isToday = (dateKey === todayStr);
+
+                let cell = document.createElement('div');
+                
+                let todayClass = isToday 
+                    ? "border-2 border-diary-blue bg-blue-50/50 shadow-sm" 
+                    : "border border-gray-200 bg-white hover:border-diary-blue/50";
+
+                cell.className = `h-12 rounded-xl p-1 flex flex-col justify-between transition overflow-hidden ${todayClass}`;
+
+                cell.innerHTML = `
+                    <div class="flex justify-between items-center px-0.5">
+                        <span class="text-[10px] ${isToday ? 'font-extrabold text-diary-blue text-xs' : 'font-bold text-gray-700'}">${day}</span>
+                        <button onclick="openCalendarDayModal('${dateKey}', event)" class="p-0.5 text-gray-400 hover:text-[#53D2DC] hover:scale-110 transition" title="Viết ghi chú">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 8h8M8 12h8M8 16h4" stroke-linecap="round"/></svg>
+                        </button>
+                    </div>
+                    <span class="text-[9px] text-gray-500 truncate font-medium px-0.5">${noteText}</span>
+                `;
+                grid.appendChild(cell);
+            }
+        }
+
+        function openCalendarDayModal(dateKey, event) {
+            event.stopPropagation();
+            selectedCalDateKey = dateKey;
+            let calData = JSON.parse(localStorage.getItem('diary_calendar_data')) || {};
+            let dayData = calData[dateKey] || {};
+            
+            document.getElementById('calendar-modal-title').innerText = `Ghi chú ngày ${dateKey}`;
+            document.getElementById('calendar-note-input').value = dayData.note || '';
+            document.getElementById('calendar-modal').classList.remove('hidden');
+        }
+
+        function closeCalendarModal() {
+            document.getElementById('calendar-modal').classList.add('hidden');
+        }
+
+        function saveCalendarDayData() {
+            let noteVal = document.getElementById('calendar-note-input').value.trim();
+            let calData = JSON.parse(localStorage.getItem('diary_calendar_data')) || {};
+            
+            calData[selectedCalDateKey] = {
+                note: noteVal
+            };
+            
+            localStorage.setItem('diary_calendar_data', JSON.stringify(calData));
+            closeCalendarModal();
+            renderCalendar();
         }
 
         function showTimetableScreen() {
@@ -873,8 +1023,10 @@
             viewScreen.classList.add('hidden');
             editorScreen.classList.add('hidden');
             archiveScreen.classList.add('hidden');
+            calendarScreen.classList.add('hidden');
             changepassScreen.classList.add('hidden');
             timetableScreen.classList.remove('hidden');
+            setActiveMenu('nav-timetable');
         }
 
         function showChangePassScreen() {
@@ -882,8 +1034,10 @@
             viewScreen.classList.add('hidden');
             editorScreen.classList.add('hidden');
             archiveScreen.classList.add('hidden');
+            calendarScreen.classList.add('hidden');
             timetableScreen.classList.add('hidden');
             changepassScreen.classList.remove('hidden');
+            setActiveMenu('nav-changepass');
             document.getElementById('old-pass').value = '';
             document.getElementById('new-pass').value = '';
             document.getElementById('changepass-status').innerText = '';
