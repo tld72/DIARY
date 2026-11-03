@@ -76,7 +76,7 @@
 
                 <!-- MẶT SAU (Back) -->
                 <div class="backface-hidden rotate-y-180 absolute inset-0 w-full h-full flex flex-col items-center justify-center rounded-3xl bg-white p-4 space-y-3">
-                    <!-- Logo sách & kính (Đã phóng to cân đối) -->
+                    <!-- Logo sách & kính (Phóng to cân đối) -->
                     <img src="https://cdn.phototourl.com/member/2026-11-01-4ccc1fd3-8c03-4211-b027-4f6c30fccfdc.png" alt="Logo" class="w-20 h-20 sm:w-24 sm:h-24 object-contain">
                     <!-- Slogan -->
                     <p class="text-xs sm:text-sm font-semibold text-diary-text tracking-widest uppercase">Your Days · Your Story</p>
@@ -102,11 +102,6 @@
             <input type="password" maxlength="1" class="pin-box w-14 h-14 text-center text-2xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveToNext(this, 2)" onkeydown="handlePinKey(event, 1)">
             <input type="password" maxlength="1" class="pin-box w-14 h-14 text-center text-2xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveToNext(this, 3)" onkeydown="handlePinKey(event, 2)">
         </div>
-
-        <button onclick="handleUnlock()" 
-            class="w-full bg-diary-blue text-white py-3 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">
-            Mở khóa
-        </button>
     </div>
 
     <!-- KHUNG GIAO DIỆN CHÍNH -->
@@ -363,21 +358,6 @@
                     </div>
                 </div>
 
-                <!-- 7. ĐỔI MẬT KHẨU -->
-                <div id="changepass-screen" class="hidden space-y-3">
-                    <div class="flex justify-between items-center border-b border-gray-100 pb-2">
-                        <h2 class="text-sm font-semibold text-diary-text">Đổi mã PIN</h2>
-                    </div>
-                    <input type="password" id="old-pass" placeholder="Mã PIN hiện tại (3 số)" maxlength="3"
-                        class="w-full px-4 py-2.5 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text text-sm">
-                    <input type="password" id="new-pass" placeholder="Mã PIN mới (3 số)" maxlength="3"
-                        class="w-full px-4 py-2.5 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text text-sm">
-                    <div class="flex space-x-3 pt-1">
-                        <button onclick="goToMain()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-sm">Hủy</button>
-                        <button onclick="updatePassword()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">Cập nhật</button>
-                    </div>
-                    <p id="changepass-status" class="text-center text-xs font-medium h-3"></p>
-                </div>
             </div>
 
             <!-- CỘT PHẢI (SIDEBAR CÀI ĐẶT & TIỆN ÍCH) -->
@@ -394,12 +374,6 @@
                         </button>
                         <button id="nav-timetable" onclick="showTimetableScreen()" class="menu-btn w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-diary-text hover:border-[#53D2DC] hover:text-[#53D2DC] transition flex items-center justify-between">
                             <span>Thời khóa biểu</span>
-                        </button>
-                        <button id="nav-changepass" onclick="showChangePassScreen()" class="menu-btn w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-diary-text hover:border-[#53D2DC] hover:text-[#53D2DC] transition flex items-center justify-between">
-                            <span>Đổi mã PIN</span>
-                        </button>
-                        <button onclick="lockDiary()" class="w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-red-500 hover:bg-red-50 hover:border-red-200 transition flex items-center justify-between">
-                            <span>Khóa ứng dụng</span>
                         </button>
                     </div>
                 </div>
@@ -461,7 +435,6 @@
         const archiveScreen = document.getElementById('archive-screen');
         const calendarScreen = document.getElementById('calendar-screen');
         const timetableScreen = document.getElementById('timetable-screen');
-        const changepassScreen = document.getElementById('changepass-screen');
         
         const diaryList = document.getElementById('diary-list');
         const archiveList = document.getElementById('archive-list');
@@ -496,7 +469,7 @@
             '"Niềm tin vào bản thân là chìa khóa mở mọi cánh cửa thành công."'
         ];
 
-        // Khởi chạy Splash screen 1s rồi chuyển qua màn hình khóa
+        // Khởi chạy Splash screen 1s chính xác rồi chuyển qua màn hình khóa PIN
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 splashScreen.classList.add('opacity-0');
@@ -506,7 +479,7 @@
                     const firstPin = document.querySelectorAll('.pin-box')[0];
                     if (firstPin) firstPin.focus();
                 }, 500);
-            }, 1000); // 1000ms = 1 giây
+            }, 1000); // 1 giây đúng chuẩn
         });
 
         function getRandomQuote() {
@@ -603,20 +576,10 @@
             archiveScreen.classList.add('hidden');
             calendarScreen.classList.add('hidden');
             timetableScreen.classList.add('hidden');
-            changepassScreen.classList.add('hidden');
             mainScreen.classList.remove('hidden');
             setActiveMenu(null);
             getRandomQuote();
             loadCurrentWeekDiary();
-        }
-
-        function lockDiary() {
-            appContainer.classList.add('hidden');
-            lockScreen.classList.remove('hidden');
-            clearPins('.pin-box');
-            setTimeout(() => {
-                document.querySelectorAll('.pin-box')[0].focus();
-            }, 100);
         }
 
         function getCurrentWeekRange() {
@@ -922,7 +885,6 @@
             editorScreen.classList.add('hidden');
             calendarScreen.classList.add('hidden');
             timetableScreen.classList.add('hidden');
-            changepassScreen.classList.add('hidden');
             archiveScreen.classList.remove('hidden');
             archiveSearchInput.value = '';
             setActiveMenu('nav-archive');
@@ -935,9 +897,8 @@
             editorScreen.classList.add('hidden');
             archiveScreen.classList.add('hidden');
             timetableScreen.classList.add('hidden');
-            changepassScreen.classList.add('hidden');
             calendarScreen.classList.remove('hidden');
-            setActiveMenu('nav-[#53D2DC]');
+            setActiveMenu('nav-calendar');
             renderCalendar();
         }
 
@@ -1024,44 +985,8 @@
             editorScreen.classList.add('hidden');
             archiveScreen.classList.add('hidden');
             calendarScreen.classList.add('hidden');
-            changepassScreen.classList.add('hidden');
             timetableScreen.classList.remove('hidden');
             setActiveMenu('nav-timetable');
-        }
-
-        function showChangePassScreen() {
-            mainScreen.classList.add('hidden');
-            viewScreen.classList.add('hidden');
-            editorScreen.classList.add('hidden');
-            archiveScreen.classList.add('hidden');
-            calendarScreen.classList.add('hidden');
-            timetableScreen.classList.add('hidden');
-            changepassScreen.classList.remove('hidden');
-            setActiveMenu('nav-changepass');
-            document.getElementById('old-pass').value = '';
-            document.getElementById('new-pass').value = '';
-            document.getElementById('changepass-status').innerText = '';
-        }
-
-        function updatePassword() {
-            let oldPass = document.getElementById('old-pass').value;
-            let newPass = document.getElementById('new-pass').value;
-            let statusText = document.getElementById('changepass-status');
-            let savedPass = localStorage.getItem('diary_password');
-            if (oldPass !== savedPass) {
-                statusText.className = "text-center text-xs font-medium text-red-500 h-3";
-                statusText.innerText = 'Mã PIN hiện tại không đúng!';
-                return;
-            }
-            if (newPass.length < 3) {
-                statusText.className = "text-center text-xs font-medium text-red-500 h-3";
-                statusText.innerText = 'Mã PIN mới phải có đủ 3 chữ số!';
-                return;
-            }
-            localStorage.setItem('diary_password', newPass);
-            statusText.className = "text-center text-xs font-medium text-diary-blue h-3";
-            statusText.innerText = 'Đổi mã PIN thành công!';
-            setTimeout(() => { goToMain(); }, 1500);
         }
     </script>
 </body>
