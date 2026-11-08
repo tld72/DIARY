@@ -286,8 +286,8 @@
     </div>
 
     <script>
-        // ĐÃ TÍCH HỢP URL GOOGLE APPS SCRIPT MỚI CỦA BẠN
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzz9TVO4pNzeWHFZZfX9ATTzKpVSeoVrGsaClo0tmu_zxJxsHLuhkLY9ksS_cAFd3utug/exec";
+        // ĐÃ TÍCH HỢP URL GOOGLE APPS SCRIPT MỚI NHẤT CỦA BẠN
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzS83hW2djgkBz0Q5DXZr4hEVd7WBLilscdl8LskYPpnsNqUr30X7lHKPTUJGrSEOnyTg/exec";
 
         const splashScreen = document.getElementById('splash-screen');
         const lockScreen = document.getElementById('lock-screen');
@@ -345,7 +345,7 @@
             }, 1000);
         });
 
-        // HÀM GỬI LÊN GOOGLE DOCS TRÊN DRIVE
+        // HÀM GỬI LÊN GOOGLE DOCS TRÊN DRIVE (ĐÃ LƯỢC BỎ NHẠC)
         function exportToGoogleDocs() {
             if (!currentActiveDate) return;
             let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
@@ -354,12 +354,11 @@
 
             let contentText = typeof entryData === 'object' ? entryData.content : entryData;
             let moodIcon = (typeof entryData === 'object' && entryData.mood) ? entryData.mood : '';
-            let spotifyUrl = (typeof entryData === 'object' && entryData.spotify) ? entryData.spotify : '';
             
             let parts = currentActiveDate.split('-');
             let fileName = `${parts[2]} - ${parts[1]}`; // Ví dụ: 31 - 10
             let dateObj = new Date(currentActiveDate + 'T00:00:00');
-            let fullDate = dateObj.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            let fullDate = dateObj.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric', year: 'numeric' }); // Định dạng DD/MM/YYYY
 
             let btn = document.getElementById('drive-export-btn');
             let originalSvg = btn.innerHTML;
@@ -374,7 +373,6 @@
                     fileName: fileName,
                     content: contentText,
                     mood: moodIcon,
-                    spotify: spotifyUrl,
                     fullDate: fullDate
                 })
             })
