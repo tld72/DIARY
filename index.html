@@ -26,77 +26,40 @@
         }
     </script>
     <style>
-        /* Hiệu ứng xoay 3D cho Flashcard */
-        .perspective-1000 {
-            perspective: 1000px;
-        }
-        .transform-style-3d {
-            transform-style: preserve-3d;
-        }
-        .backface-hidden {
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-        }
-        .rotate-y-180 {
-            transform: rotateY(180deg);
-        }
-        
-        /* Animation trượt thanh tiến trình 1 giây */
-        @keyframes loadingProgress {
-            0% { width: 0%; }
-            100% { width: 100%; }
-        }
-        .animate-progress {
-            animation: loadingProgress 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-        
-        /* Animation lật thẻ 1 giây */
-        @keyframes flipCardAnimation {
-            0% { transform: rotateY(0deg); }
-            100% { transform: rotateY(180deg); }
-        }
-        .animate-flip-card {
-            animation: flipCardAnimation 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        @keyframes loadingProgress { 0% { width: 0%; } 100% { width: 100%; } }
+        .animate-progress { animation: loadingProgress 1s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        @keyframes flipCardAnimation { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(180deg); } }
+        .animate-flip-card { animation: flipCardAnimation 1s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
     </style>
 </head>
 <body class="bg-diary-bg h-screen w-screen overflow-hidden flex items-center justify-center p-3 sm:p-6 font-sans relative">
     
-    <!-- 0. MÀN HÌNH SPLASH SCREEN FLASHCARD -->
+    <!-- 0. SPLASH SCREEN -->
     <div id="splash-screen" class="fixed inset-0 bg-diary-bg z-50 flex flex-col items-center justify-center p-4 transition-opacity duration-500">
-        
-        <!-- Flashcard 3D Container -->
         <div class="perspective-1000 w-72 h-44 sm:w-80 sm:h-48 mb-8">
             <div id="flashcard" class="transform-style-3d animate-flip-card w-full h-full relative rounded-3xl shadow-xl border border-gray-100 bg-white">
-                
-                <!-- MẶT TRƯỚC (Front) -->
                 <div class="backface-hidden absolute inset-0 w-full h-full flex items-center justify-center rounded-3xl bg-white p-6">
                     <h1 class="text-4xl font-bold text-[#53D2DC] tracking-wide">tld</h1>
                 </div>
-
-                <!-- MẶT SAU (Back) -->
                 <div class="backface-hidden rotate-y-180 absolute inset-0 w-full h-full flex flex-col items-center justify-center rounded-3xl bg-white p-4 space-y-3">
-                    <!-- Logo sách & kính (Phóng to cân đối) -->
                     <img src="https://cdn.phototourl.com/member/2026-11-01-4ccc1fd3-8c03-4211-b027-4f6c30fccfdc.png" alt="Logo" class="w-20 h-20 sm:w-24 sm:h-24 object-contain">
-                    <!-- Slogan -->
                     <p class="text-xs sm:text-sm font-semibold text-diary-text tracking-widest uppercase">Your Days · Your Story</p>
                 </div>
-
             </div>
         </div>
-
-        <!-- Thanh trượt tiến trình (Progress Bar - 1s) -->
         <div class="w-48 sm:w-56 h-1.5 bg-gray-200 rounded-full overflow-hidden">
             <div class="h-full bg-[#53D2DC] rounded-full animate-progress"></div>
         </div>
     </div>
 
-    <!-- 1. MÀN HÌNH KHÓA BAN ĐẦU -->
+    <!-- 1. MÀN HÌNH KHÓA -->
     <div id="lock-screen" class="hidden w-full sm:max-w-xl bg-white sm:rounded-3xl shadow-xl p-6 sm:p-10 space-y-6 border border-gray-100 text-center">
         <h1 class="text-3xl sm:text-4xl font-bold text-[#53D2DC] tracking-wide">tld</h1>
         <p id="lock-message" class="text-diary-text text-sm sm:text-base font-medium">Nhập mã PIN</p>
-        
-        <!-- 3 Ô GÕ PIN -->
         <div class="flex justify-center space-x-3">
             <input type="password" maxlength="1" class="pin-box w-14 h-14 text-center text-2xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveToNext(this, 1)" onkeydown="handlePinKey(event, 0)">
             <input type="password" maxlength="1" class="pin-box w-14 h-14 text-center text-2xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveToNext(this, 2)" onkeydown="handlePinKey(event, 1)">
@@ -106,32 +69,27 @@
 
     <!-- KHUNG GIAO DIỆN CHÍNH -->
     <div id="app-container" class="hidden w-full max-h-[95vh] sm:max-w-5xl bg-white sm:rounded-3xl shadow-xl overflow-hidden border border-gray-100 p-5 sm:p-7 flex flex-col justify-between z-10">
-        
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
             
-            <!-- CỘT TRÁI (2/3 KHÔNG GIAN NỘI DUNG CHÍNH) -->
             <div class="md:col-span-2 space-y-4">
                 <div class="flex justify-between items-center pb-2 border-b border-gray-100">
                     <h1 onclick="goToMain()" class="text-2xl font-bold text-[#53D2DC] tracking-wide cursor-pointer hover:opacity-80 transition">tld</h1>
                     <span id="entry-count-badge" class="text-xs bg-diary-blue/10 text-diary-blue px-3 py-1 rounded-full font-medium"></span>
                 </div>
 
-                <!-- 1. MÀN HÌNH CHÍNH (Nhật ký tuần này) -->
+                <!-- 1. MÀN HÌNH CHÍNH -->
                 <div id="main-screen" class="space-y-3">
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-semibold text-diary-blue uppercase tracking-wider">Nhật ký tuần này</span>
                         <span id="current-week-label" class="text-xs text-gray-400"></span>
                     </div>
 
-                    <button onclick="openNewEditor()" 
-                        class="w-full bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm flex items-center justify-center space-x-2">
+                    <button onclick="openNewEditor()" class="w-full bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm flex items-center justify-center space-x-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         <span>Viết nhật ký mới</span>
                     </button>
 
-                    <div id="diary-list" class="space-y-2.5 max-h-[260px] sm:max-h-[280px] overflow-y-auto pr-1">
-                        <!-- Danh sách nhật ký tuần này -->
-                    </div>
+                    <div id="diary-list" class="space-y-2.5 max-h-[260px] sm:max-h-[280px] overflow-y-auto pr-1"></div>
                 </div>
 
                 <!-- 2. MÀN HÌNH XEM CHI TIẾT -->
@@ -141,6 +99,13 @@
                             <span id="view-mood" class="text-lg"></span>
                             <span id="view-date-title" class="font-semibold text-diary-blue text-sm"></span>
                         </div>
+                        
+                        <!-- NÚT ICON GỬI THẲNG LÊN GOOGLE DOCS (DRIVE) -->
+                        <button id="drive-export-btn" onclick="exportToGoogleDocs()" class="p-1.5 bg-gray-50 border border-gray-200 rounded-lg hover:border-[#53D2DC] hover:text-[#53D2DC] text-diary-text transition shadow-sm" title="Lưu thành file Google Docs trên Drive">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                        </button>
                     </div>
                     
                     <div id="view-content" class="w-full p-3.5 bg-gray-50 border border-diary-border rounded-xl h-36 overflow-y-auto text-diary-text text-sm whitespace-pre-wrap leading-relaxed"></div>
@@ -150,12 +115,8 @@
                     </div>
 
                     <div class="flex space-x-3 pt-1">
-                        <button onclick="switchToEditFromView()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">
-                            Sửa bài này
-                        </button>
-                        <button onclick="goToMain()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-sm">
-                            Đóng
-                        </button>
+                        <button onclick="switchToEditFromView()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">Sửa bài này</button>
+                        <button onclick="closeViewScreen()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-sm">Đóng</button>
                     </div>
                 </div>
 
@@ -176,17 +137,12 @@
 
                     <div class="relative flex items-center">
                         <span class="absolute left-3 text-spotify-green font-bold text-sm">🎵</span>
-                        <input type="text" id="spotify-link-input" placeholder="Dán link bài hát Spotify vào đây..."
-                            class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-diary-border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-spotify-green/30 text-diary-text">
+                        <input type="text" id="spotify-link-input" placeholder="Dán link bài hát Spotify vào đây..." class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-diary-border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-spotify-green/30 text-diary-text">
                     </div>
 
-                    <textarea id="entry-content" rows="4" placeholder="Hôm nay của bạn thế nào..."
-                        class="w-full p-3 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 resize-none text-diary-text text-sm leading-relaxed"></textarea>
+                    <textarea id="entry-content" rows="4" placeholder="Hôm nay của bạn thế nào..." class="w-full p-3 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 resize-none text-diary-text text-sm leading-relaxed"></textarea>
                     
-                    <button onclick="saveEntry()" 
-                        class="w-full bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">
-                        Lưu nhật ký
-                    </button>
+                    <button onclick="saveEntry()" class="w-full bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">Lưu nhật ký</button>
                     <p id="save-status" class="text-center text-xs text-diary-blue h-3 font-medium"></p>
                 </div>
 
@@ -199,12 +155,9 @@
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </span>
-                        <input type="text" id="archive-search-input" oninput="loadArchiveList()" placeholder="Tìm kiếm theo ngày, thứ hoặc nội dung..." 
-                            class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-diary-border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text">
+                        <input type="text" id="archive-search-input" oninput="loadArchiveList()" placeholder="Tìm kiếm theo ngày, thứ hoặc nội dung..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-diary-border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text">
                     </div>
-                    <div id="archive-list" class="space-y-4 max-h-[260px] sm:max-h-[280px] overflow-y-auto pr-1">
-                        <!-- Danh sách lưu trữ -->
-                    </div>
+                    <div id="archive-list" class="space-y-4 max-h-[260px] sm:max-h-[280px] overflow-y-auto pr-1"></div>
                 </div>
 
                 <!-- 5. LỊCH NGỌT NGÀO -->
@@ -216,9 +169,7 @@
                     <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold text-gray-400 pb-1">
                         <div>T2</div><div>T3</div><div>T4</div><div>T5</div><div>T6</div><div>T7</div><div>CN</div>
                     </div>
-                    <div id="calendar-grid" class="grid grid-cols-7 gap-1.5 max-h-[260px] overflow-y-auto p-1">
-                        <!-- Ô ngày lịch -->
-                    </div>
+                    <div id="calendar-grid" class="grid grid-cols-7 gap-1.5 max-h-[260px] overflow-y-auto p-1"></div>
                 </div>
 
                 <!-- 6. THỜI KHÓA BIỂU -->
@@ -239,119 +190,35 @@
                             </thead>
                             <tbody class="divide-y divide-gray-100 text-diary-text">
                                 <tr class="align-top">
-                                    <td class="p-1.5 border-r border-gray-100">
-                                        <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
-                                            <span>HĐTN - HN</span>
-                                            <span class="text-[10px] opacity-75 mt-0.5">7:15 - 8:45</span>
-                                        </div>
-                                    </td>
-                                    <td class="p-1.5 border-r border-gray-100 space-y-1">
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>KHTN</span></div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Ngoại Ngữ</span></div>
-                                    </td>
-                                    <td class="p-1.5 border-r border-gray-100 space-y-1">
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Công Nghệ</span></div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>GDĐP</span></div>
-                                    </td>
-                                    <td class="p-1.5 border-r border-gray-100 space-y-1">
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>HĐTN</span></div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>KHTN</span></div>
-                                    </td>
-                                    <td class="p-1.5">
-                                        <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
-                                            <span>KHTN</span>
-                                            <span class="text-[10px] opacity-75 mt-0.5">7:15 - 8:45</span>
-                                        </div>
-                                    </td>
+                                    <td class="p-1.5 border-r border-gray-100"><div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center"><span>HĐTN - HN</span><span class="text-[10px] opacity-75 mt-0.5">7:15 - 8:45</span></div></td>
+                                    <td class="p-1.5 border-r border-gray-100 space-y-1"><div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>KHTN</span></div><div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Ngoại Ngữ</span></div></td>
+                                    <td class="p-1.5 border-r border-gray-100 space-y-1"><div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Công Nghệ</span></div><div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>GDĐP</span></div></td>
+                                    <td class="p-1.5 border-r border-gray-100 space-y-1"><div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>HĐTN</span></div><div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>KHTN</span></div></td>
+                                    <td class="p-1.5"><div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center"><span>KHTN</span><span class="text-[10px] opacity-75 mt-0.5">7:15 - 8:45</span></div></td>
                                 </tr>
-                                <tr class="bg-cyan-50/40">
-                                    <td colspan="5" class="p-1 text-center font-medium text-cyan-800 text-[10px]">Ra chơi</td>
-                                </tr>
+                                <tr class="bg-cyan-50/40"><td colspan="5" class="p-1 text-center font-medium text-cyan-800 text-[10px]">Ra chơi</td></tr>
                                 <tr class="align-top">
-                                    <td class="p-1.5 border-r border-gray-100">
-                                        <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
-                                            <span>GDTC</span>
-                                            <span class="text-[10px] opacity-75 mt-0.5">9:15 - 10:45</span>
-                                        </div>
-                                    </td>
-                                    <td class="p-1.5 border-r border-gray-100">
-                                        <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
-                                            <span>Văn</span>
-                                            <span class="text-[10px] opacity-75 mt-0.5">9:15 - 10:45</span>
-                                        </div>
-                                    </td>
-                                    <td class="p-1.5 border-r border-gray-100">
-                                        <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
-                                            <span>Ngoại Ngữ</span>
-                                            <span class="text-[10px] opacity-75 mt-0.5">9:15 - 10:45</span>
-                                        </div>
-                                    </td>
-                                    <td class="p-1.5 border-r border-gray-100">
-                                        <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
-                                            <span>Toán</span>
-                                            <span class="text-[10px] opacity-75 mt-0.5">9:15 - 10:45</span>
-                                        </div>
-                                    </td>
-                                    <td class="p-1.5 space-y-1">
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Văn</span></div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>LS - ĐL</span></div>
-                                    </td>
+                                    <td class="p-1.5 border-r border-gray-100"><div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center"><span>GDTC</span><span class="text-[10px] opacity-75 mt-0.5">9:15 - 10:45</span></div></td>
+                                    <td class="p-1.5 border-r border-gray-100"><div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center"><span>Văn</span><span class="text-[10px] opacity-75 mt-0.5">9:15 - 10:45</span></div></td>
+                                    <td class="p-1.5 border-r border-gray-100"><div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center"><span>Ngoại Ngữ</span><span class="text-[10px] opacity-75 mt-0.5">9:15 - 10:45</span></div></td>
+                                    <td class="p-1.5 border-r border-gray-100"><div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center"><span>Toán</span><span class="text-[10px] opacity-75 mt-0.5">9:15 - 10:45</span></div></td>
+                                    <td class="p-1.5 space-y-1"><div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Văn</span></div><div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>LS - ĐL</span></div></td>
                                 </tr>
-                                <tr class="bg-gray-50/60">
-                                    <td colspan="5" class="p-1.5 text-center font-medium text-gray-600 text-[10px]">Ăn trưa - Ngủ trưa</td>
-                                </tr>
+                                <tr class="bg-gray-50/60"><td colspan="5" class="p-1.5 text-center font-medium text-gray-600 text-[10px]">Ăn trưa - Ngủ trưa</td></tr>
                                 <tr class="align-top">
-                                    <td class="p-1.5 border-r border-gray-100 space-y-1">
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Văn</span></div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>TATC</span></div>
-                                    </td>
-                                    <td class="p-1.5 border-r border-gray-100">
-                                        <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
-                                            <span>TATC</span>
-                                            <span class="text-[10px] opacity-75 mt-0.5">1:15 - 2:45</span>
-                                        </div>
-                                    </td>
-                                    <td class="p-1.5 border-r border-gray-100 space-y-1">
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>GDCD</span></div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Tin</span></div>
-                                    </td>
-                                    <td class="p-1.5 border-r border-gray-100 space-y-1">
-                                        <div class="bg-gray-50 text-gray-400 p-1.5 rounded-lg text-center italic h-[36px] flex flex-col justify-center">Trống</div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>LS - ĐL</span></div>
-                                    </td>
-                                    <td class="p-1.5 space-y-1">
-                                        <div class="bg-gray-50 text-gray-400 p-1.5 rounded-lg text-center italic h-[36px] flex flex-col justify-center">Trống</div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Toán</span></div>
-                                    </td>
+                                    <td class="p-1.5 border-r border-gray-100 space-y-1"><div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Văn</span></div><div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>TATC</span></div></td>
+                                    <td class="p-1.5 border-r border-gray-100"><div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center"><span>TATC</span><span class="text-[10px] opacity-75 mt-0.5">1:15 - 2:45</span></div></td>
+                                    <td class="p-1.5 border-r border-gray-100 space-y-1"><div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>GDCD</span></div><div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Tin</span></div></td>
+                                    <td class="p-1.5 border-r border-gray-100 space-y-1"><div class="bg-gray-50 text-gray-400 p-1.5 rounded-lg text-center italic h-[36px] flex flex-col justify-center">Trống</div><div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>LS - ĐL</span></div></td>
+                                    <td class="p-1.5 space-y-1"><div class="bg-gray-50 text-gray-400 p-1.5 rounded-lg text-center italic h-[36px] flex flex-col justify-center">Trống</div><div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Toán</span></div></td>
                                 </tr>
-                                <tr class="bg-cyan-50/40">
-                                    <td colspan="5" class="p-1 text-center font-medium text-cyan-800 text-[10px]">Ra chơi</td>
-                                </tr>
+                                <tr class="bg-cyan-50/40"><td colspan="5" class="p-1 text-center font-medium text-cyan-800 text-[10px]">Ra chơi</td></tr>
                                 <tr class="align-top">
-                                    <td class="p-1.5 border-r border-gray-100">
-                                        <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
-                                            <span>TABN</span>
-                                            <span class="text-[10px] opacity-75 mt-0.5">3:15 - 4:45</span>
-                                        </div>
-                                    </td>
-                                    <td class="p-1.5 border-r border-gray-100">
-                                        <div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center">
-                                            <span>IC3</span>
-                                            <span class="text-[10px] opacity-75 mt-0.5">3:15 - 4:45</span>
-                                        </div>
-                                    </td>
-                                    <td class="p-1.5 border-r border-gray-100 space-y-1">
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Toán</span></div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>STEM</span></div>
-                                    </td>
-                                    <td class="p-1.5 border-r border-gray-100 space-y-1">
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>LS - ĐL</span></div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>A.I</span></div>
-                                    </td>
-                                    <td class="p-1.5 space-y-1">
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Mĩ Thuật</span></div>
-                                        <div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Âm Nhạc</span></div>
-                                    </td>
+                                    <td class="p-1.5 border-r border-gray-100"><div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center"><span>TABN</span><span class="text-[10px] opacity-75 mt-0.5">3:15 - 4:45</span></div></td>
+                                    <td class="p-1.5 border-r border-gray-100"><div class="bg-cyan-100 text-cyan-800 p-2 rounded-lg font-medium h-[76px] flex flex-col justify-center"><span>IC3</span><span class="text-[10px] opacity-75 mt-0.5">3:15 - 4:45</span></div></td>
+                                    <td class="p-1.5 border-r border-gray-100 space-y-1"><div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Toán</span></div><div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>STEM</span></div></td>
+                                    <td class="p-1.5 border-r border-gray-100 space-y-1"><div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>LS - ĐL</span></div><div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>A.I</span></div></td>
+                                    <td class="p-1.5 space-y-1"><div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Mĩ Thuật</span></div><div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>Âm Nhạc</span></div></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -360,11 +227,10 @@
 
             </div>
 
-            <!-- CỘT PHẢI (SIDEBAR CÀI ĐẶT & TIỆN ÍCH) -->
+            <!-- CỘT PHẢI (SIDEBAR) -->
             <div class="md:col-span-1 bg-gray-50 p-4 sm:p-5 rounded-2xl border border-gray-100 flex flex-col justify-between space-y-5">
                 <div class="space-y-3">
                     <h3 class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Cài đặt & Tiện ích</h3>
-                    
                     <div class="space-y-2">
                         <button id="nav-archive" onclick="showArchiveScreen()" class="menu-btn w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-diary-text hover:border-[#53D2DC] hover:text-[#53D2DC] transition flex items-center justify-between">
                             <span>Kho tàng ký ức</span>
@@ -379,28 +245,22 @@
                 </div>
 
                 <div class="p-3.5 bg-white border border-[#53D2DC]/30 rounded-2xl shadow-sm space-y-2">
-                    <div class="flex items-center space-x-1.5 text-[#53D2DC] font-semibold text-xs">
-                        <span>Động lực mỗi ngày</span>
-                    </div>
-                    <p id="daily-quote" class="text-xs text-diary-text italic leading-relaxed font-medium">
-                        "Hãy kiên trì từng chút một, mỗi ngày bạn viết nên một trang đời rực rỡ."
-                    </p>
+                    <div class="flex items-center space-x-1.5 text-[#53D2DC] font-semibold text-xs"><span>Động lực mỗi ngày</span></div>
+                    <p id="daily-quote" class="text-xs text-diary-text italic leading-relaxed font-medium">"Hãy kiên trì từng chút một, mỗi ngày bạn viết nên một trang đời rực rỡ."</p>
                 </div>
             </div>
 
         </div>
     </div>
 
-    <!-- MODAL GHI CHÚ CHO LỊCH -->
+    <!-- MODAL LỊCH -->
     <div id="calendar-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-5 w-full max-w-xs space-y-4 shadow-xl border border-gray-100 text-center">
             <h3 id="calendar-modal-title" class="text-xs font-bold text-diary-blue">Ghi chú ngày</h3>
-            
             <div class="space-y-1 text-left">
                 <label class="text-[11px] font-semibold text-gray-500">Nội dung ghi chú:</label>
                 <input type="text" id="calendar-note-input" placeholder="Ví dụ: Kiểm tra 1 tiết Toán..." class="w-full p-2.5 bg-gray-50 border border-diary-border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text">
             </div>
-
             <div class="flex space-x-2 pt-1">
                 <button onclick="closeCalendarModal()" class="w-1/2 bg-gray-100 text-diary-text py-2 rounded-xl font-semibold text-xs hover:bg-gray-200 transition">Hủy</button>
                 <button onclick="saveCalendarDayData()" class="w-1/2 bg-diary-blue text-white py-2 rounded-xl font-semibold text-xs hover:bg-blue-900 transition shadow-sm">Lưu ghi chú</button>
@@ -408,7 +268,7 @@
         </div>
     </div>
 
-    <!-- MODAL XÁC NHẬN MẬT KHẨU KHI SỬA / XÓA -->
+    <!-- MODAL PIN -->
     <div id="auth-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4 shadow-xl border border-gray-100 text-center">
             <h3 id="auth-modal-title" class="text-sm font-semibold text-diary-text">Xác nhận mã PIN để tiếp tục</h3>
@@ -426,6 +286,9 @@
     </div>
 
     <script>
+        // ĐÃ TÍCH HỢP URL GOOGLE APPS SCRIPT MỚI CỦA BẠN
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzz9TVO4pNzeWHFZZfX9ATTzKpVSeoVrGsaClo0tmu_zxJxsHLuhkLY9ksS_cAFd3utug/exec";
+
         const splashScreen = document.getElementById('splash-screen');
         const lockScreen = document.getElementById('lock-screen');
         const appContainer = document.getElementById('app-container');
@@ -458,6 +321,7 @@
         let pendingAction = null; 
         let pendingDate = null;
         let selectedCalDateKey = null;
+        let previousScreen = 'main-screen';
 
         const motivationalQuotes = [
             '"Hãy kiên trì từng chút một, mỗi ngày bạn viết nên một trang đời rực rỡ."',
@@ -469,7 +333,6 @@
             '"Niềm tin vào bản thân là chìa khóa mở mọi cánh cửa thành công."'
         ];
 
-        // Khởi chạy Splash screen 1s chính xác rồi chuyển qua màn hình khóa PIN
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 splashScreen.classList.add('opacity-0');
@@ -479,8 +342,53 @@
                     const firstPin = document.querySelectorAll('.pin-box')[0];
                     if (firstPin) firstPin.focus();
                 }, 500);
-            }, 1000); // 1 giây đúng chuẩn
+            }, 1000);
         });
+
+        // HÀM GỬI LÊN GOOGLE DOCS TRÊN DRIVE
+        function exportToGoogleDocs() {
+            if (!currentActiveDate) return;
+            let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
+            let entryData = entries[currentActiveDate];
+            if (!entryData) return;
+
+            let contentText = typeof entryData === 'object' ? entryData.content : entryData;
+            let moodIcon = (typeof entryData === 'object' && entryData.mood) ? entryData.mood : '';
+            let spotifyUrl = (typeof entryData === 'object' && entryData.spotify) ? entryData.spotify : '';
+            
+            let parts = currentActiveDate.split('-');
+            let fileName = `${parts[2]} - ${parts[1]}`; // Ví dụ: 31 - 10
+            let dateObj = new Date(currentActiveDate + 'T00:00:00');
+            let fullDate = dateObj.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+            let btn = document.getElementById('drive-export-btn');
+            let originalSvg = btn.innerHTML;
+            btn.innerHTML = `<span class="text-[10px] text-diary-blue font-bold px-1">Đang lưu...</span>`;
+            btn.disabled = true;
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    fileName: fileName,
+                    content: contentText,
+                    mood: moodIcon,
+                    spotify: spotifyUrl,
+                    fullDate: fullDate
+                })
+            })
+            .then(() => {
+                alert(`Đã lưu bài viết ngày ${fileName} thành công thành file Google Docs trên Drive!`);
+                btn.innerHTML = originalSvg;
+                btn.disabled = false;
+            })
+            .catch(err => {
+                alert("Lỗi khi kết nối Drive: " + err);
+                btn.innerHTML = originalSvg;
+                btn.disabled = false;
+            });
+        }
 
         function getRandomQuote() {
             const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
@@ -502,30 +410,19 @@
         }
 
         function moveToNext(el, boxNum) {
-            if (el.value.length === 1 && boxNum < 3) {
-                document.querySelectorAll('.pin-box')[boxNum].focus();
-            }
-            if (boxNum === 3 && el.value.length === 1) {
-                handleUnlock();
-            }
+            if (el.value.length === 1 && boxNum < 3) document.querySelectorAll('.pin-box')[boxNum].focus();
+            if (boxNum === 3 && el.value.length === 1) handleUnlock();
         }
 
         function handlePinKey(e, index) {
             let boxes = document.querySelectorAll('.pin-box');
-            if (e.key === 'Backspace' && !boxes[index].value && index > 0) {
-                boxes[index - 1].focus();
-            } else if (e.key === 'Enter') {
-                handleUnlock();
-            }
+            if (e.key === 'Backspace' && !boxes[index].value && index > 0) boxes[index - 1].focus();
+            else if (e.key === 'Enter') handleUnlock();
         }
 
         function moveAuthNext(el, boxNum) {
-            if (el.value.length === 1 && boxNum < 3) {
-                document.querySelectorAll('.auth-pin')[boxNum].focus();
-            }
-            if (boxNum === 3 && el.value.length === 1) {
-                verifyAuthAction();
-            }
+            if (el.value.length === 1 && boxNum < 3) document.querySelectorAll('.auth-pin')[boxNum].focus();
+            if (boxNum === 3 && el.value.length === 1) verifyAuthAction();
         }
 
         function getPinValue(selector) {
@@ -543,9 +440,7 @@
             if (!url) return '';
             try {
                 let match = url.match(/spotify\.com\/(?:[a-zA-Z0-9_-]+\/)?(track|album|playlist)\/([a-zA-Z0-9]+)/);
-                if (match && match[1] && match[2]) {
-                    return `https://open.spotify.com/embed/${match[1]}/${match[2]}`;
-                }
+                if (match && match[1] && match[2]) return `https://open.spotify.com/embed/${match[1]}/${match[2]}`;
             } catch (e) {}
             return '';
         }
@@ -558,9 +453,8 @@
                 localStorage.setItem('diary_password', enteredPin);
                 goToMain();
             } else {
-                if (enteredPin === savedPass) {
-                    goToMain();
-                } else {
+                if (enteredPin === savedPass) goToMain();
+                else {
                     alert('Mã PIN không đúng!');
                     clearPins('.pin-box');
                     document.querySelectorAll('.pin-box')[0].focus();
@@ -577,6 +471,7 @@
             calendarScreen.classList.add('hidden');
             timetableScreen.classList.add('hidden');
             mainScreen.classList.remove('hidden');
+            previousScreen = 'main-screen';
             setActiveMenu(null);
             getRandomQuote();
             loadCurrentWeekDiary();
@@ -598,25 +493,18 @@
             diaryList.innerHTML = '';
             let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
             let dates = Object.keys(entries).sort().reverse();
-            
             let { monday, sunday } = getCurrentWeekRange();
             currentWeekLabel.innerText = `${monday.toLocaleDateString('vi-VN')} - ${sunday.toLocaleDateString('vi-VN')}`;
-
             let weekDates = dates.filter(date => {
                 let d = new Date(date + 'T00:00:00');
                 return d >= monday && d <= sunday;
             });
-
             entryCountBadge.innerText = `${weekDates.length} bài tuần này`;
-
             if (weekDates.length === 0) {
                 diaryList.innerHTML = '<p class="text-center text-gray-400 py-4 text-xs">Tuần này chưa có bài nhật ký nào.</p>';
                 return;
             }
-
-            weekDates.forEach(date => {
-                renderDiaryItem(date, entries[date], diaryList);
-            });
+            weekDates.forEach(date => renderDiaryItem(date, entries[date], diaryList));
         }
 
         function loadArchiveList() {
@@ -632,7 +520,6 @@
                 let formattedDateStr = dateObj.toLocaleDateString('vi-VN');
                 let fullWeekdayStr = dateObj.toLocaleDateString('vi-VN', { weekday: 'long' }).toLowerCase();
                 let shortWeekdayStr = dateObj.toLocaleDateString('vi-VN', { weekday: 'short' }).toLowerCase();
-
                 return content.toLowerCase().includes(keyword) || formattedDateStr.includes(keyword) || date.includes(keyword) || fullWeekdayStr.includes(keyword) || shortWeekdayStr.includes(keyword);
             });
 
@@ -649,7 +536,6 @@
                 let monday = new Date(new Date(d).setDate(diffToMonday));
                 let sunday = new Date(monday);
                 sunday.setDate(monday.getDate() + 6);
-                
                 let weekKey = `${monday.toLocaleDateString('vi-VN')} đến ${sunday.toLocaleDateString('vi-VN')}`;
                 if (!weeksMap[weekKey]) weeksMap[weekKey] = [];
                 weeksMap[weekKey].push(date);
@@ -659,14 +545,9 @@
                 let groupDiv = document.createElement('div');
                 groupDiv.className = "space-y-1.5";
                 groupDiv.innerHTML = `<div class="text-xs font-bold text-diary-blue bg-blue-50 px-3 py-1 rounded-lg">Tuần: ${weekKey}</div>`;
-                
                 let itemsContainer = document.createElement('div');
                 itemsContainer.className = "space-y-2 pl-2";
-                
-                weeksMap[weekKey].forEach(date => {
-                    renderDiaryItem(date, entries[date], itemsContainer);
-                });
-                
+                weeksMap[weekKey].forEach(date => renderDiaryItem(date, entries[date], itemsContainer));
                 groupDiv.appendChild(itemsContainer);
                 archiveList.appendChild(groupDiv);
             });
@@ -677,7 +558,6 @@
             let hasMusic = (typeof entryData === 'object' && entryData.spotify) ? '🎵 ' : '';
             let div = document.createElement('div');
             div.className = "flex justify-between items-center p-3 bg-gray-50 border border-gray-100 rounded-xl hover:bg-gray-100/80 transition";
-            
             let dateObj = new Date(date + 'T00:00:00');
             let formattedDate = dateObj.toLocaleDateString('vi-VN', { weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric' });
             
@@ -698,23 +578,21 @@
         function setMood(mood) {
             selectedMood = mood;
             document.querySelectorAll('.mood-btn').forEach(btn => {
-                if (btn.getAttribute('data-mood') === mood) {
-                    btn.classList.add('bg-gray-200', 'ring-2', 'ring-diary-blue/50');
-                } else {
-                    btn.classList.remove('bg-gray-200', 'ring-2', 'ring-diary-blue/50');
-                }
+                if (btn.getAttribute('data-mood') === mood) btn.classList.add('bg-gray-200', 'ring-2', 'ring-diary-blue/50');
+                else btn.classList.remove('bg-gray-200', 'ring-2', 'ring-diary-blue/50');
             });
         }
 
         function clearMoodSelection() {
             selectedMood = null;
-            document.querySelectorAll('.mood-btn').forEach(btn => {
-                btn.classList.remove('bg-gray-200', 'ring-2', 'ring-diary-blue/50');
-            });
+            document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('bg-gray-200', 'ring-2', 'ring-diary-blue/50'));
         }
 
         function openView(date) {
             currentActiveDate = date;
+            if (!archiveScreen.classList.contains('hidden')) previousScreen = 'archive-screen';
+            else if (!mainScreen.classList.contains('hidden')) previousScreen = 'main-screen';
+
             mainScreen.classList.add('hidden');
             archiveScreen.classList.add('hidden');
             calendarScreen.classList.add('hidden');
@@ -745,21 +623,20 @@
             }
         }
 
-        function switchToEditFromView() {
-            requestEdit(currentActiveDate);
+        function closeViewScreen() {
+            viewScreen.classList.add('hidden');
+            if (previousScreen === 'archive-screen') {
+                archiveScreen.classList.remove('hidden');
+                setActiveMenu('nav-archive');
+            } else {
+                mainScreen.classList.remove('hidden');
+                setActiveMenu(null);
+            }
         }
 
-        function requestEdit(date) {
-            pendingAction = 'edit';
-            pendingDate = date;
-            showAuthModal('Nhập mã PIN để chỉnh sửa bài nhật ký');
-        }
-
-        function requestDelete(date) {
-            pendingAction = 'delete';
-            pendingDate = date;
-            showAuthModal('Nhập mã PIN để xóa bài nhật ký');
-        }
+        function switchToEditFromView() { requestEdit(currentActiveDate); }
+        function requestEdit(date) { pendingAction = 'edit'; pendingDate = date; showAuthModal('Nhập mã PIN để chỉnh sửa bài nhật ký'); }
+        function requestDelete(date) { pendingAction = 'delete'; pendingDate = date; showAuthModal('Nhập mã PIN để xóa bài nhật ký'); }
 
         function showAuthModal(title) {
             document.getElementById('auth-modal-title').innerText = title;
@@ -779,20 +656,13 @@
             let enteredPin = getPinValue('.auth-pin');
             let savedPass = localStorage.getItem('diary_password');
             let statusEl = document.getElementById('auth-status');
-            if (enteredPin.length < 3) {
-                statusEl.innerText = 'Vui lòng nhập đủ 3 số!';
-                return;
-            }
+            if (enteredPin.length < 3) { statusEl.innerText = 'Vui lòng nhập đủ 3 số!'; return; }
             if (enteredPin === savedPass) {
                 let action = pendingAction;
                 let dateToProcess = pendingDate;
                 closeAuthModal();
-                if (action === 'edit') {
-                    viewScreen.classList.add('hidden');
-                    openEdit(dateToProcess);
-                } else if (action === 'delete') {
-                    executeDelete(dateToProcess);
-                }
+                if (action === 'edit') { viewScreen.classList.add('hidden'); openEdit(dateToProcess); }
+                else if (action === 'delete') { executeDelete(dateToProcess); }
             } else {
                 statusEl.innerText = 'Mã PIN không đúng!';
                 clearPins('.auth-pin');
@@ -807,15 +677,12 @@
             editorScreen.classList.remove('hidden');
             saveStatus.innerText = '';
             setActiveMenu(null);
-            
             let today = new Date().toLocaleDateString('en-CA');
             currentActiveDate = today;
             entryDate.value = today;
             spotifyLinkInput.value = '';
-            
             let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
             let entryData = entries[today];
-            
             if (entryData && typeof entryData === 'object') {
                 entryContent.value = entryData.content || '';
                 spotifyLinkInput.value = entryData.spotify || '';
@@ -834,7 +701,6 @@
             saveStatus.innerText = '';
             currentActiveDate = date;
             entryDate.value = date;
-            
             let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
             let entryData = entries[date];
             if (entryData && typeof entryData === 'object') {
@@ -854,18 +720,10 @@
             let spotifyVal = spotifyLinkInput.value.trim();
             if (!dateVal) { alert('Vui lòng chọn ngày!'); return; }
             let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
-            entries[dateVal] = {
-                content: contentVal,
-                mood: selectedMood || '',
-                spotify: spotifyVal
-            };
+            entries[dateVal] = { content: contentVal, mood: selectedMood || '', spotify: spotifyVal };
             localStorage.setItem('diary_entries', JSON.stringify(entries));
             saveStatus.innerText = 'Đã lưu thành công!';
-            
-            setTimeout(() => {
-                editorScreen.classList.add('hidden');
-                openView(dateVal);
-            }, 800);
+            setTimeout(() => { editorScreen.classList.add('hidden'); openView(dateVal); }, 800);
         }
 
         function executeDelete(date) {
@@ -909,35 +767,22 @@
             const year = now.getFullYear();
             const month = now.getMonth();
             const todayStr = now.toLocaleDateString('en-CA');
-            
             document.getElementById('calendar-month-year').innerText = `Tháng ${month + 1} / ${year}`;
-
             const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const calData = JSON.parse(localStorage.getItem('diary_calendar_data')) || {};
-
             let emptyCells = firstDay === 0 ? 6 : firstDay - 1;
-            for (let i = 0; i < emptyCells; i++) {
-                grid.innerHTML += `<div class="h-12 bg-transparent"></div>`;
-            }
-
+            for (let i = 0; i < emptyCells; i++) grid.innerHTML += `<div class="h-12 bg-transparent"></div>`;
             for (let day = 1; day <= daysInMonth; day++) {
                 let monthStr = String(month + 1).padStart(2, '0');
                 let dayStr = String(day).padStart(2, '0');
                 let dateKey = `${year}-${monthStr}-${dayStr}`;
-                
                 let dayData = calData[dateKey] || {};
                 let noteText = dayData.note ? dayData.note : '';
                 let isToday = (dateKey === todayStr);
-
                 let cell = document.createElement('div');
-                
-                let todayClass = isToday 
-                    ? "border-2 border-diary-blue bg-blue-50/50 shadow-sm" 
-                    : "border border-gray-200 bg-white hover:border-diary-blue/50";
-
+                let todayClass = isToday ? "border-2 border-diary-blue bg-blue-50/50 shadow-sm" : "border border-gray-200 bg-white hover:border-diary-blue/50";
                 cell.className = `h-12 rounded-xl p-1 flex flex-col justify-between transition overflow-hidden ${todayClass}`;
-
                 cell.innerHTML = `
                     <div class="flex justify-between items-center px-0.5">
                         <span class="text-[10px] ${isToday ? 'font-extrabold text-diary-blue text-xs' : 'font-bold text-gray-700'}">${day}</span>
@@ -956,24 +801,16 @@
             selectedCalDateKey = dateKey;
             let calData = JSON.parse(localStorage.getItem('diary_calendar_data')) || {};
             let dayData = calData[dateKey] || {};
-            
             document.getElementById('calendar-modal-title').innerText = `Ghi chú ngày ${dateKey}`;
             document.getElementById('calendar-note-input').value = dayData.note || '';
             document.getElementById('calendar-modal').classList.remove('hidden');
         }
 
-        function closeCalendarModal() {
-            document.getElementById('calendar-modal').classList.add('hidden');
-        }
-
+        function closeCalendarModal() { document.getElementById('calendar-modal').classList.add('hidden'); }
         function saveCalendarDayData() {
             let noteVal = document.getElementById('calendar-note-input').value.trim();
             let calData = JSON.parse(localStorage.getItem('diary_calendar_data')) || {};
-            
-            calData[selectedCalDateKey] = {
-                note: noteVal
-            };
-            
+            calData[selectedCalDateKey] = { note: noteVal };
             localStorage.setItem('diary_calendar_data', JSON.stringify(calData));
             closeCalendarModal();
             renderCalendar();
