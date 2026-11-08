@@ -4,9 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>tld</title>
+    
+    <!-- TỐI ƯU SEO & OPEN GRAPH (HIỂN THỊ KHI CHIA SẺ LINK) -->
+    <meta name="description" content="Your Days · Your Story">
+    <meta property="og:title" content="tld">
+    <meta property="og:image" content="https://cdn.phototourl.com/member/2026-11-01-4ccc1fd3-8c03-4211-b027-4f6c30fccfdc.png">
+    
     <!-- ICON TRÊN TAB TRÌNH DUYỆT WEB -->
     <link rel="icon" type="image/png" href="https://cdn.phototourl.com/member/2026-11-01-4ccc1fd3-8c03-4211-b027-4f6c30fccfdc.png">
     <link rel="apple-touch-icon" href="https://cdn.phototourl.com/member/2026-11-01-4ccc1fd3-8c03-4211-b027-4f6c30fccfdc.png">
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -36,42 +43,42 @@
         .animate-flip-card { animation: flipCardAnimation 1s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
     </style>
 </head>
-<body class="bg-diary-bg h-screen w-screen overflow-hidden flex items-center justify-center p-3 sm:p-6 font-sans relative">
+<body class="bg-diary-bg min-h-screen w-screen overflow-x-hidden flex items-center justify-center p-2 sm:p-6 font-sans relative">
     
     <!-- 0. SPLASH SCREEN -->
     <div id="splash-screen" class="fixed inset-0 bg-diary-bg z-50 flex flex-col items-center justify-center p-4 transition-opacity duration-500">
-        <div class="perspective-1000 w-72 h-44 sm:w-80 sm:h-48 mb-8">
+        <div class="perspective-1000 w-64 h-40 sm:w-80 sm:h-48 mb-8">
             <div id="flashcard" class="transform-style-3d animate-flip-card w-full h-full relative rounded-3xl shadow-xl border border-gray-100 bg-white">
                 <div class="backface-hidden absolute inset-0 w-full h-full flex items-center justify-center rounded-3xl bg-white p-6">
                     <h1 class="text-4xl font-bold text-[#53D2DC] tracking-wide">tld</h1>
                 </div>
                 <div class="backface-hidden rotate-y-180 absolute inset-0 w-full h-full flex flex-col items-center justify-center rounded-3xl bg-white p-4 space-y-3">
-                    <img src="https://cdn.phototourl.com/member/2026-11-01-4ccc1fd3-8c03-4211-b027-4f6c30fccfdc.png" alt="Logo" class="w-20 h-20 sm:w-24 sm:h-24 object-contain">
-                    <p class="text-xs sm:text-sm font-semibold text-diary-text tracking-widest uppercase">Your Days · Your Story</p>
+                    <img src="https://cdn.phototourl.com/member/2026-11-01-4ccc1fd3-8c03-4211-b027-4f6c30fccfdc.png" alt="Logo" class="w-16 h-16 sm:w-24 sm:h-24 object-contain">
+                    <p class="text-[11px] sm:text-sm font-semibold text-diary-text tracking-widest uppercase">Your Days · Your Story</p>
                 </div>
             </div>
         </div>
-        <div class="w-48 sm:w-56 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+        <div class="w-44 sm:w-56 h-1.5 bg-gray-200 rounded-full overflow-hidden">
             <div class="h-full bg-[#53D2DC] rounded-full animate-progress"></div>
         </div>
     </div>
 
     <!-- 1. MÀN HÌNH KHÓA -->
-    <div id="lock-screen" class="hidden w-full sm:max-w-xl bg-white sm:rounded-3xl shadow-xl p-6 sm:p-10 space-y-6 border border-gray-100 text-center">
+    <div id="lock-screen" class="hidden w-full max-w-sm sm:max-w-xl bg-white rounded-2xl sm:rounded-3xl shadow-xl p-5 sm:p-10 space-y-5 border border-gray-100 text-center mx-3">
         <h1 class="text-3xl sm:text-4xl font-bold text-[#53D2DC] tracking-wide">tld</h1>
         <p id="lock-message" class="text-diary-text text-sm sm:text-base font-medium">Nhập mã PIN</p>
-        <div class="flex justify-center space-x-3">
-            <input type="password" maxlength="1" class="pin-box w-14 h-14 text-center text-2xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveToNext(this, 1)" onkeydown="handlePinKey(event, 0)">
-            <input type="password" maxlength="1" class="pin-box w-14 h-14 text-center text-2xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveToNext(this, 2)" onkeydown="handlePinKey(event, 1)">
-            <input type="password" maxlength="1" class="pin-box w-14 h-14 text-center text-2xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveToNext(this, 3)" onkeydown="handlePinKey(event, 2)">
+        <div class="flex justify-center space-x-2.5 sm:space-x-3">
+            <input type="password" maxlength="1" class="pin-box w-12 h-12 sm:w-14 sm:h-14 text-center text-xl sm:text-2xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveToNext(this, 1)" onkeydown="handlePinKey(event, 0)">
+            <input type="password" maxlength="1" class="pin-box w-12 h-12 sm:w-14 sm:h-14 text-center text-xl sm:text-2xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveToNext(this, 2)" onkeydown="handlePinKey(event, 1)">
+            <input type="password" maxlength="1" class="pin-box w-12 h-12 sm:w-14 sm:h-14 text-center text-xl sm:text-2xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveToNext(this, 3)" onkeydown="handlePinKey(event, 2)">
         </div>
     </div>
 
     <!-- KHUNG GIAO DIỆN CHÍNH -->
-    <div id="app-container" class="hidden w-full max-h-[95vh] sm:max-w-5xl bg-white sm:rounded-3xl shadow-xl overflow-hidden border border-gray-100 p-5 sm:p-7 flex flex-col justify-between z-10">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+    <div id="app-container" class="hidden w-full max-w-full sm:max-w-5xl bg-white rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden border border-gray-100 p-3 sm:p-7 flex flex-col justify-between z-10 mx-2 my-auto">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 items-start">
             
-            <div class="md:col-span-2 space-y-4">
+            <div class="md:col-span-2 space-y-3.5">
                 <div class="flex justify-between items-center pb-2 border-b border-gray-100">
                     <h1 onclick="goToMain()" class="text-2xl font-bold text-[#53D2DC] tracking-wide cursor-pointer hover:opacity-80 transition">tld</h1>
                     <span id="entry-count-badge" class="text-xs bg-diary-blue/10 text-diary-blue px-3 py-1 rounded-full font-medium"></span>
@@ -89,19 +96,19 @@
                         <span>Viết nhật ký mới</span>
                     </button>
 
-                    <div id="diary-list" class="space-y-2.5 max-h-[260px] sm:max-h-[280px] overflow-y-auto pr-1"></div>
+                    <div id="diary-list" class="space-y-2.5 max-h-[240px] sm:max-h-[280px] overflow-y-auto pr-1"></div>
                 </div>
 
                 <!-- 2. MÀN HÌNH XEM CHI TIẾT -->
                 <div id="view-screen" class="hidden space-y-3">
                     <div class="flex justify-between items-center border-b border-gray-100 pb-2">
-                        <div class="flex items-center space-x-2">
-                            <span id="view-mood" class="text-lg"></span>
-                            <span id="view-date-title" class="font-semibold text-diary-blue text-sm"></span>
+                        <div class="flex items-center space-x-2 overflow-hidden pr-2">
+                            <span id="view-mood" class="text-lg shrink-0"></span>
+                            <span id="view-date-title" class="font-semibold text-diary-blue text-xs sm:text-sm truncate"></span>
                         </div>
                         
                         <!-- NÚT ICON GỬI THẲNG LÊN GOOGLE DOCS (DRIVE) -->
-                        <button id="drive-export-btn" onclick="exportToGoogleDocs()" class="p-1.5 bg-gray-50 border border-gray-200 rounded-lg hover:border-[#53D2DC] hover:text-[#53D2DC] text-diary-text transition shadow-sm" title="Lưu thành file Google Docs trên Drive">
+                        <button id="drive-export-btn" onclick="exportToGoogleDocs()" class="p-1.5 bg-gray-50 border border-gray-200 rounded-lg hover:border-[#53D2DC] hover:text-[#53D2DC] text-diary-text transition shadow-sm shrink-0" title="Lưu thành file Google Docs trên Drive">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                             </svg>
@@ -114,9 +121,9 @@
                         <iframe id="spotify-iframe" style="border-radius:12px" src="" width="100%" height="80" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
                     </div>
 
-                    <div class="flex space-x-3 pt-1">
-                        <button onclick="switchToEditFromView()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">Sửa bài này</button>
-                        <button onclick="closeViewScreen()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-sm">Đóng</button>
+                    <div class="flex space-x-2 sm:space-x-3 pt-1">
+                        <button onclick="switchToEditFromView()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-xs sm:text-sm">Sửa bài này</button>
+                        <button onclick="closeViewScreen()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-xs sm:text-sm">Đóng</button>
                     </div>
                 </div>
 
@@ -126,13 +133,13 @@
                         <input type="date" id="entry-date" class="border border-diary-border bg-gray-50 px-3 py-1.5 rounded-xl text-xs text-diary-text focus:outline-none focus:ring-2 focus:ring-diary-blue/30">
                     </div>
                     
-                    <div class="flex items-center space-x-2 bg-gray-50 px-3 py-1.5 border border-diary-border rounded-xl">
-                        <span class="text-xs text-diary-text font-medium mr-1">Tâm trạng:</span>
-                        <button type="button" onclick="setMood('😊')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base" data-mood="😊">😊</button>
-                        <button type="button" onclick="setMood('😌')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base" data-mood="😌">😌</button>
-                        <button type="button" onclick="setMood('😢')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base" data-mood="😢">😢</button>
-                        <button type="button" onclick="setMood('🔥')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base" data-mood="🔥">🔥</button>
-                        <button type="button" onclick="setMood('🤔')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base" data-mood="🤔">🤔</button>
+                    <div class="flex items-center space-x-1.5 sm:space-x-2 bg-gray-50 px-3 py-1.5 border border-diary-border rounded-xl overflow-x-auto">
+                        <span class="text-xs text-diary-text font-medium mr-1 shrink-0">Tâm trạng:</span>
+                        <button type="button" onclick="setMood('😊')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base shrink-0" data-mood="😊">😊</button>
+                        <button type="button" onclick="setMood('😌')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base shrink-0" data-mood="😌">😌</button>
+                        <button type="button" onclick="setMood('😢')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base shrink-0" data-mood="😢">😢</button>
+                        <button type="button" onclick="setMood('🔥')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base shrink-0" data-mood="🔥">🔥</button>
+                        <button type="button" onclick="setMood('🤔')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base shrink-0" data-mood="🤔">🤔</button>
                     </div>
 
                     <div class="relative flex items-center">
@@ -157,7 +164,7 @@
                         </span>
                         <input type="text" id="archive-search-input" oninput="loadArchiveList()" placeholder="Tìm kiếm theo ngày, thứ hoặc nội dung..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-diary-border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text">
                     </div>
-                    <div id="archive-list" class="space-y-4 max-h-[260px] sm:max-h-[280px] overflow-y-auto pr-1"></div>
+                    <div id="archive-list" class="space-y-4 max-h-[240px] sm:max-h-[280px] overflow-y-auto pr-1"></div>
                 </div>
 
                 <!-- 5. LỊCH NGỌT NGÀO -->
@@ -169,16 +176,16 @@
                     <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold text-gray-400 pb-1">
                         <div>T2</div><div>T3</div><div>T4</div><div>T5</div><div>T6</div><div>T7</div><div>CN</div>
                     </div>
-                    <div id="calendar-grid" class="grid grid-cols-7 gap-1.5 max-h-[260px] overflow-y-auto p-1"></div>
+                    <div id="calendar-grid" class="grid grid-cols-7 gap-1.5 max-h-[240px] sm:max-h-[260px] overflow-y-auto p-1"></div>
                 </div>
 
-                <!-- 6. THỜI KHÓA BIỂU -->
+                <!-- 6. THỜI KHÓA BIỂU (TỐI ƯU CUỘN NGANG TRÊN MOBILE) -->
                 <div id="timetable-screen" class="hidden space-y-3">
                     <div class="flex justify-between items-center border-b border-gray-100 pb-2">
                         <h2 class="text-sm font-semibold text-diary-blue">Thời khóa biểu lớp 7</h2>
                     </div>
-                    <div class="max-h-[310px] overflow-y-auto pr-1">
-                        <table class="w-full text-left text-[11px] border-collapse">
+                    <div class="max-h-[300px] overflow-y-auto overflow-x-auto pr-1">
+                        <table class="w-full min-w-[500px] text-left text-[11px] border-collapse">
                             <thead>
                                 <tr class="bg-cyan-50 text-cyan-900 border-b border-cyan-100">
                                     <th class="p-2 border-r border-cyan-100 font-bold w-1/5">Thứ 2</th>
@@ -228,7 +235,7 @@
             </div>
 
             <!-- CỘT PHẢI (SIDEBAR) -->
-            <div class="md:col-span-1 bg-gray-50 p-4 sm:p-5 rounded-2xl border border-gray-100 flex flex-col justify-between space-y-5">
+            <div class="md:col-span-1 bg-gray-50 p-3.5 sm:p-5 rounded-2xl border border-gray-100 flex flex-col justify-between space-y-4">
                 <div class="space-y-3">
                     <h3 class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Cài đặt & Tiện ích</h3>
                     <div class="space-y-2">
@@ -345,7 +352,7 @@
             }, 1000);
         });
 
-        // HÀM GỬI LÊN GOOGLE DOCS TRÊN DRIVE (ĐÃ LƯỢC BỎ NHẠC)
+        // HÀM GỬI LÊN GOOGLE DOCS TRÊN DRIVE (ĐÃ LƯỢC BỎ NHẠC, CHUẨN FORMAT)
         function exportToGoogleDocs() {
             if (!currentActiveDate) return;
             let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
