@@ -117,7 +117,10 @@
             
             <div class="md:col-span-2 space-y-3.5">
                 <div class="flex justify-between items-center pb-2 border-b border-gray-100">
-                    <h1 onclick="goToMain()" class="text-2xl font-bold text-[#53D2DC] tracking-wide cursor-pointer hover:opacity-80 transition">tld</h1>
+                    <div class="flex items-center space-x-2.5">
+                        <h1 onclick="goToMain()" class="text-2xl font-bold text-[#53D2DC] tracking-wide cursor-pointer hover:opacity-80 transition">tld</h1>
+                        <span id="sync-status-badge" onclick="pullFromCloudSync(true)" class="text-[11px] text-gray-400 cursor-pointer hover:text-diary-blue transition" title="Bấm để tải lại dữ liệu từ Drive"></span>
+                    </div>
                     <span id="entry-count-badge" class="text-xs bg-diary-blue/10 text-diary-blue px-3 py-1 rounded-full font-medium"></span>
                 </div>
 
@@ -497,6 +500,7 @@
         const saveStatus = document.getElementById('save-status');
         const entryCountBadge = document.getElementById('entry-count-badge');
         const dailyQuoteEl = document.getElementById('daily-quote');
+        const syncStatusBadge = document.getElementById('sync-status-badge');
         
         let currentActiveDate = null;
         let selectedMood = null;
@@ -507,6 +511,7 @@
         let previousScreen = 'main-screen';
         let isDrawingMemory = false;
         let editingMusicDateKey = null;
+        let isSyncingFromCloud = false;
 
         // BIẾN QUẢN LÝ THÁNG ĐANG XEM TRÊN LỊCH
         let calViewYear = new Date().getFullYear();
@@ -586,7 +591,96 @@
             });
         }
 
+        function setSyncBadge(text, colorClass = 'text-gray-400') {
+            if (!syncStatusBadge) return;
+            syncStatusBadge.innerText = text;
+            syncStatusBadge.className = `text-[11px] cursor-pointer hover:text-diary-blue transition ${colorClass}`;
+        }
+
+        function collectLocalBackupObject() {
+            const data = {};
+            BACKUP_KEYS.forEach(key => {
+                const raw = localStorage.getItem(key);
+                if (raw !== null) {
+                    try {
+                        data[key] = JSON.parse(raw);
+                    } catch (e) {
+                        data[key] = raw;
+                    }
+                }
+            });
+            return data;
+        }
+
+        function applyBackupObjectToLocal(sourceData) {
+            if (!sourceData || typeof sourceData !== 'object') return 0;
+            let count = 0;
+            BACKUP_KEYS.forEach(key => {
+                if (Object.prototype.hasOwnProperty.call(sourceData, key) && sourceData[key] !== null && sourceData[key] !== undefined) {
+                    const valStr = typeof sourceData[key] === 'string' ? sourceData[key] : JSON.stringify(sourceData[key]);
+                    localStorage.setItem(key, valStr);
+                    count++;
+                }
+            });
+            return count;
+        }
+
+        function refreshActiveViewsAfterSync() {
+            if (!mainScreen.classList.contains('hidden')) loadCurrentWeekDiary();
+            if (!archiveScreen.classList.contains('hidden')) loadArchiveList();
+            if (!calendarScreen.classList.contains('hidden')) renderCalendar();
+            if (!timetableScreen.classList.contains('hidden')) renderTimetable();
+            if (!musicScreen.classList.contains('hidden')) renderMusicList(true);
+        }
+
+        // TỰ ĐỘNG TẢI DỮ LIỆU MỚI NHẤT TỪ GOOGLE DRIVE QUA DOGET
+        async function pullFromCloudSync(showManualFeedback = false) {
+            if (!SCRIPT_URL || isSyncingFromCloud) return;
+            isSyncingFromCloud = true;
+            if (showManualFeedback) setSyncBadge('Đang đồng bộ...', 'text-diary-blue');
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=sync_load&t=${Date.now()}`, { method: 'GET' });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const json = await res.json();
+                if (json && json.ok && json.data && typeof json.data === 'object' && Object.keys(json.data).length > 0) {
+                    applyBackupObjectToLocal(json.data);
+                    refreshActiveViewsAfterSync();
+                    setSyncBadge('Đã đồng bộ Drive', 'text-emerald-600');
+                } else {
+                    setSyncBadge('Drive trống', 'text-gray-400');
+                }
+            } catch (err) {
+                setSyncBadge('Offline / Lỗi mạng', 'text-amber-600');
+            } finally {
+                isSyncingFromCloud = false;
+            }
+        }
+
+        // TỰ ĐỘNG ĐẨY DỮ LIỆU LÊN GOOGLE DRIVE KHI CÓ THAY ĐỔI
+        function pushToCloudSync() {
+            if (!SCRIPT_URL) return;
+            setSyncBadge('Đang lưu Drive...', 'text-diary-blue');
+            const payload = {
+                action: 'sync_save',
+                updatedAt: new Date().toISOString(),
+                data: collectLocalBackupObject()
+            };
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                setSyncBadge('Đã đồng bộ Drive', 'text-emerald-600');
+            })
+            .catch(() => {
+                setSyncBadge('Lưu máy (chờ mạng)', 'text-amber-600');
+            });
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
+            pullFromCloudSync(false);
             setTimeout(() => {
                 splashScreen.classList.add('opacity-0');
                 setTimeout(() => {
@@ -645,19 +739,13 @@
                         alert('File sao lưu không hợp lệ.');
                         return;
                     }
-                    let importedCount = 0;
-                    BACKUP_KEYS.forEach(key => {
-                        if (Object.prototype.hasOwnProperty.call(sourceData, key) && sourceData[key] !== null) {
-                            const valStr = typeof sourceData[key] === 'string' ? sourceData[key] : JSON.stringify(sourceData[key]);
-                            localStorage.setItem(key, valStr);
-                            importedCount++;
-                        }
-                    });
+                    const importedCount = applyBackupObjectToLocal(sourceData);
                     if (importedCount === 0) {
                         alert('Không tìm thấy dữ liệu của tld trong file này.');
                         return;
                     }
-                    alert('Đã nhập dữ liệu thành công! Trang sẽ tải lại để cập nhật.');
+                    pushToCloudSync();
+                    alert('Đã nhập dữ liệu thành công và đồng bộ lên Drive! Trang sẽ tải lại để cập nhật.');
                     window.location.reload();
                 } catch (err) {
                     alert('Không thể đọc file sao lưu: ' + err.message);
@@ -832,6 +920,7 @@
 
             if (updated) {
                 localStorage.setItem('diary_auto_song_titles', JSON.stringify(autoCache));
+                pushToCloudSync();
                 if (!musicScreen.classList.contains('hidden')) {
                     renderMusicList(false);
                 }
@@ -944,6 +1033,7 @@
             if (nameVal) customTitles[editingMusicDateKey] = nameVal;
             else delete customTitles[editingMusicDateKey];
             localStorage.setItem('diary_song_titles', JSON.stringify(customTitles));
+            pushToCloudSync();
             closeMusicNameModal();
             renderMusicList(false);
         }
@@ -954,6 +1044,7 @@
             let savedPass = localStorage.getItem('diary_password');
             if (!savedPass) {
                 localStorage.setItem('diary_password', enteredPin);
+                pushToCloudSync();
                 goToMain();
             } else {
                 if (enteredPin === savedPass) goToMain();
@@ -1381,6 +1472,7 @@
             let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
             entries[dateVal] = { content: contentVal, mood: selectedMood || '', spotify: spotifyVal };
             localStorage.setItem('diary_entries', JSON.stringify(entries));
+            pushToCloudSync();
             saveStatus.innerText = 'Đã lưu thành công!';
             setTimeout(() => { editorScreen.classList.add('hidden'); openView(dateVal, false); }, 800);
         }
@@ -1390,6 +1482,7 @@
                 let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
                 delete entries[date];
                 localStorage.setItem('diary_entries', JSON.stringify(entries));
+                pushToCloudSync();
                 loadCurrentWeekDiary();
                 loadArchiveList();
                 goToMain();
@@ -1525,6 +1618,7 @@
                 calData[selectedCalDateKey] = { note: noteVal, tag: selectedCalTag };
             }
             localStorage.setItem('diary_calendar_data', JSON.stringify(calData));
+            pushToCloudSync();
             closeCalendarModal();
             renderCalendar();
         }
@@ -1665,6 +1759,7 @@
             }
 
             localStorage.setItem('diary_timetable_data', JSON.stringify(data));
+            pushToCloudSync();
             closeTimetableModal();
             renderTimetable();
         }
