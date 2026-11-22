@@ -162,8 +162,8 @@
                         <iframe id="spotify-iframe" style="border-radius:12px" src="" width="100%" height="80" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
                     </div>
                     <div class="flex space-x-2 sm:space-x-3 pt-1">
-                        <button onclick="switchToEditFromView()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-xs sm:text-sm">Sửa bài này</button>
-                        <button onclick="closeViewScreen()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-xs sm:text-sm">Đóng</button>
+                        <button id="view-edit-btn" onclick="switchToEditFromView()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-xs sm:text-sm">Sửa bài này</button>
+                        <button id="view-close-btn" onclick="closeViewScreen()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-xs sm:text-sm">Đóng</button>
                     </div>
                 </div>
 
@@ -540,6 +540,16 @@
             }, 1000);
         });
 
+        // KIỂM TRA BÀI NHẬT KÝ ĐÃ QUÁ 7 NGÀY HAY CHƯA
+        function isEntryExpiredForEdit(dateStr) {
+            if (!dateStr) return false;
+            const entryDateObj = new Date(dateStr + 'T00:00:00');
+            const todayObj = new Date();
+            todayObj.setHours(0, 0, 0, 0);
+            const diffDays = Math.floor((todayObj.getTime() - entryDateObj.getTime()) / (1000 * 60 * 60 * 24));
+            return diffDays > 7;
+        }
+
         // PHÍM ENTER TIỆN ÍCH
         function handleSpotifyKey(e) {
             if (e.key === 'Enter') {
@@ -767,19 +777,25 @@
         function renderDiaryItem(date, entryData, container) {
             let moodIcon = (typeof entryData === 'object' && entryData !== null && entryData.mood) ? entryData.mood : '';
             let hasMusic = (typeof entryData === 'object' && entryData.spotify) ? '🎵 ' : '';
+            let expiredEdit = isEntryExpiredForEdit(date);
             let div = document.createElement('div');
             div.className = "flex justify-between items-center p-3 bg-gray-50 border border-gray-100 rounded-xl hover:bg-gray-100/80 transition";
             let dateObj = new Date(date + 'T00:00:00');
             let formattedDate = dateObj.toLocaleDateString('vi-VN', { weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric' });
+            let lockedBadge = expiredEdit ? `<span class="text-[10px] text-gray-400 italic">Đã khóa sửa (&gt;7 ngày)</span>` : '';
+            let editButtonHtml = expiredEdit ? '' : `<button onclick="requestEdit('${date}')" class="px-2.5 py-1 bg-gray-200 text-diary-text font-medium rounded-lg hover:bg-gray-300 transition">Sửa</button>`;
             
             div.innerHTML = `
                 <div class="flex items-center space-x-2.5 overflow-hidden">
                     <span class="text-base">${moodIcon}</span>
-                    <span class="font-medium text-diary-text text-xs sm:text-sm truncate">${hasMusic}${formattedDate}</span>
+                    <div class="flex flex-col overflow-hidden">
+                        <span class="font-medium text-diary-text text-xs sm:text-sm truncate">${hasMusic}${formattedDate}</span>
+                        ${lockedBadge}
+                    </div>
                 </div>
                 <div class="space-x-1 text-xs flex items-center shrink-0">
                     <button onclick="openView('${date}', false)" class="px-2.5 py-1 bg-diary-blue/10 text-diary-blue font-medium rounded-lg hover:bg-diary-blue/20 transition">Xem</button>
-                    <button onclick="requestEdit('${date}')" class="px-2.5 py-1 bg-gray-200 text-diary-text font-medium rounded-lg hover:bg-gray-300 transition">Sửa</button>
+                    ${editButtonHtml}
                     <button onclick="requestDelete('${date}')" class="px-2.5 py-1 bg-red-50 text-red-500 font-medium rounded-lg hover:bg-red-100 transition">Xóa</button>
                 </div>
             `;
@@ -924,6 +940,18 @@
             viewDateTitle.innerText = `Ngày ${formattedDate}`;
             viewContent.innerText = contentText || 'Không có nội dung.';
 
+            const editBtn = document.getElementById('view-edit-btn');
+            const closeBtn = document.getElementById('view-close-btn');
+            if (isEntryExpiredForEdit(date)) {
+                editBtn.classList.add('hidden');
+                closeBtn.classList.remove('w-1/2');
+                closeBtn.classList.add('w-full');
+            } else {
+                editBtn.classList.remove('hidden');
+                closeBtn.classList.remove('w-full');
+                closeBtn.classList.add('w-1/2');
+            }
+
             const randomBanner = document.getElementById('random-memory-banner');
             const randomCaption = document.getElementById('random-memory-caption');
             if (isRandom) {
@@ -957,7 +985,15 @@
         }
 
         function switchToEditFromView() { requestEdit(currentActiveDate); }
-        function requestEdit(date) { pendingAction = 'edit'; pendingDate = date; showAuthModal('Nhập mã PIN để chỉnh sửa bài nhật ký'); }
+        function requestEdit(date) {
+            if (isEntryExpiredForEdit(date)) {
+                alert('Bài nhật ký này đã quá 7 ngày nên không thể chỉnh sửa nữa, chỉ có thể xem hoặc xóa.');
+                return;
+            }
+            pendingAction = 'edit';
+            pendingDate = date;
+            showAuthModal('Nhập mã PIN để chỉnh sửa bài nhật ký');
+        }
         function requestDelete(date) { pendingAction = 'delete'; pendingDate = date; showAuthModal('Nhập mã PIN để xóa bài nhật ký'); }
 
         function showAuthModal(title) {
@@ -983,7 +1019,14 @@
                 let action = pendingAction;
                 let dateToProcess = pendingDate;
                 closeAuthModal();
-                if (action === 'edit') { viewScreen.classList.add('hidden'); openEdit(dateToProcess); }
+                if (action === 'edit') {
+                    if (isEntryExpiredForEdit(dateToProcess)) {
+                        alert('Bài nhật ký này đã quá 7 ngày nên không thể chỉnh sửa nữa.');
+                        return;
+                    }
+                    viewScreen.classList.add('hidden');
+                    openEdit(dateToProcess);
+                }
                 else if (action === 'delete') { executeDelete(dateToProcess); }
             } else {
                 statusEl.innerText = 'Mã PIN không đúng!';
@@ -1017,6 +1060,10 @@
         }
 
         function openEdit(date) {
+            if (isEntryExpiredForEdit(date)) {
+                alert('Bài nhật ký này đã quá 7 ngày nên không thể chỉnh sửa nữa.');
+                return;
+            }
             mainScreen.classList.add('hidden');
             viewScreen.classList.add('hidden');
             calendarScreen.classList.add('hidden');
