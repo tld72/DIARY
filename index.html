@@ -258,6 +258,18 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- 7. MỤC NHẠC ĐÃ CHỌN -->
+                <div id="music-screen" class="hidden space-y-3">
+                    <div class="flex justify-between items-center border-b border-gray-100 pb-2 gap-2">
+                        <h2 class="text-sm font-semibold text-diary-blue">Nhạc đã chọn</h2>
+                        <span id="music-count-badge" class="text-[11px] text-gray-400"></span>
+                    </div>
+                    <div id="music-preview-box" class="hidden rounded-xl overflow-hidden border border-gray-100 bg-gray-50 p-2">
+                        <iframe id="music-library-iframe" style="border-radius:10px" src="" width="100%" height="80" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                    </div>
+                    <div id="music-list" class="space-y-2 max-h-[240px] sm:max-h-[280px] overflow-y-auto pr-1"></div>
+                </div>
             </div>
 
             <!-- CỘT PHẢI (SIDEBAR) -->
@@ -274,12 +286,28 @@
                         <button id="nav-timetable" onclick="showTimetableScreen()" class="menu-btn w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-diary-text hover:border-[#53D2DC] hover:text-[#53D2DC] transition flex items-center justify-between">
                             <span>Thời khóa biểu</span>
                         </button>
+                        <button id="nav-music" onclick="showMusicScreen()" class="menu-btn w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-diary-text hover:border-[#53D2DC] hover:text-[#53D2DC] transition flex items-center justify-between">
+                            <span>Nhạc</span>
+                        </button>
                     </div>
                 </div>
                 <div class="p-3.5 bg-white border border-[#53D2DC]/30 rounded-2xl shadow-sm space-y-2">
                     <div class="flex items-center space-x-1.5 text-[#53D2DC] font-semibold text-xs"><span>Động lực mỗi ngày</span></div>
                     <p id="daily-quote" class="text-xs text-diary-text italic leading-relaxed font-medium">"Hãy kiên trì từng chút một, mỗi ngày bạn viết nên một trang đời rực rỡ."</p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SỬA TÊN BÀI HÁT -->
+    <div id="music-name-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4 shadow-xl border border-gray-100 text-center">
+            <h3 class="text-sm font-bold text-diary-blue">Đặt tên bài hát</h3>
+            <p id="music-name-date-label" class="text-xs text-gray-400"></p>
+            <input type="text" id="music-custom-name-input" onkeydown="if(event.key==='Enter') saveCustomSongName()" class="w-full p-3 bg-gray-50 border border-diary-border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text">
+            <div class="flex space-x-2.5 pt-1">
+                <button onclick="closeMusicNameModal()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold text-xs sm:text-sm hover:bg-gray-200 transition">Hủy</button>
+                <button onclick="saveCustomSongName()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold text-xs sm:text-sm hover:bg-blue-900 transition shadow-sm">Lưu tên</button>
             </div>
         </div>
     </div>
@@ -434,6 +462,7 @@
         const archiveScreen = document.getElementById('archive-screen');
         const calendarScreen = document.getElementById('calendar-screen');
         const timetableScreen = document.getElementById('timetable-screen');
+        const musicScreen = document.getElementById('music-screen');
         
         const diaryList = document.getElementById('diary-list');
         const archiveList = document.getElementById('archive-list');
@@ -460,6 +489,7 @@
         let selectedCalTag = '';
         let previousScreen = 'main-screen';
         let isDrawingMemory = false;
+        let editingMusicDateKey = null;
 
         // BIẾN QUẢN LÝ THÁNG ĐANG XEM TRÊN LỊCH
         let calViewYear = new Date().getFullYear();
@@ -681,6 +711,158 @@
             return '';
         }
 
+        // LẤY TÊN BÀI HÁT MẶC ĐỊNH TỪ OEMBED SPOTIFY (CÓ CACHE + TÊN TỰ ĐẶT NẾU CÓ)
+        function getSongTitleForEntry(dateKey, spotifyUrl) {
+            const customTitles = JSON.parse(localStorage.getItem('diary_song_titles')) || {};
+            if (customTitles[dateKey] && customTitles[dateKey].trim()) {
+                return customTitles[dateKey].trim();
+            }
+            const autoCache = JSON.parse(localStorage.getItem('diary_auto_song_titles')) || {};
+            if (spotifyUrl && autoCache[spotifyUrl] && autoCache[spotifyUrl].trim()) {
+                return autoCache[spotifyUrl].trim();
+            }
+            return spotifyUrl ? 'Nhạc Spotify' : 'Bài hát chưa đặt tên';
+        }
+
+        async function resolveDefaultSpotifyTitles(musicItems) {
+            const autoCache = JSON.parse(localStorage.getItem('diary_auto_song_titles')) || {};
+            const customTitles = JSON.parse(localStorage.getItem('diary_song_titles')) || {};
+            let updated = false;
+
+            for (const item of musicItems) {
+                if (customTitles[item.dateKey] || !item.spotifyUrl) continue;
+                if (autoCache[item.spotifyUrl]) continue;
+                try {
+                    const oembedUrl = `https://open.spotify.com/oembed?url=${encodeURIComponent(item.spotifyUrl)}`;
+                    const res = await fetch(oembedUrl);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data && data.title) {
+                            autoCache[item.spotifyUrl] = data.title.trim();
+                            updated = true;
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            if (updated) {
+                localStorage.setItem('diary_auto_song_titles', JSON.stringify(autoCache));
+                if (!musicScreen.classList.contains('hidden')) {
+                    renderMusicList(false);
+                }
+            }
+        }
+
+        function showMusicScreen() {
+            mainScreen.classList.add('hidden');
+            viewScreen.classList.add('hidden');
+            editorScreen.classList.add('hidden');
+            archiveScreen.classList.add('hidden');
+            calendarScreen.classList.add('hidden');
+            timetableScreen.classList.add('hidden');
+            musicScreen.classList.remove('hidden');
+            setActiveMenu('nav-music');
+            renderMusicList(true);
+            resetScrollPositions([document.getElementById('music-list')]);
+        }
+
+        function renderMusicList(shouldFetchDefaultNames = true) {
+            const listEl = document.getElementById('music-list');
+            const badgeEl = document.getElementById('music-count-badge');
+            const previewBox = document.getElementById('music-preview-box');
+            const previewIframe = document.getElementById('music-library-iframe');
+            listEl.innerHTML = '';
+            previewBox.classList.add('hidden');
+            previewIframe.src = '';
+
+            let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
+            let dates = Object.keys(entries).sort().reverse();
+            let musicItems = [];
+
+            dates.forEach(dateKey => {
+                let entryData = entries[dateKey];
+                let spotifyUrl = (typeof entryData === 'object' && entryData !== null && entryData.spotify) ? entryData.spotify.trim() : '';
+                if (spotifyUrl) {
+                    musicItems.push({
+                        dateKey,
+                        spotifyUrl,
+                        title: getSongTitleForEntry(dateKey, spotifyUrl)
+                    });
+                }
+            });
+
+            badgeEl.innerText = `${musicItems.length} bài`;
+
+            if (musicItems.length === 0) {
+                listEl.innerHTML = '<p class="text-center text-gray-400 py-5 text-xs">Chưa có bài hát nào được gắn trong nhật ký.</p>';
+                return;
+            }
+
+            musicItems.forEach(item => {
+                let dateObj = new Date(item.dateKey + 'T00:00:00');
+                let chosenDateStr = dateObj.toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' });
+                let embedUrl = getSpotifyEmbedUrl(item.spotifyUrl);
+
+                let row = document.createElement('div');
+                row.className = 'p-3 bg-gray-50 border border-gray-100 rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 hover:bg-gray-100/80 transition';
+                row.innerHTML = `
+                    <div class="overflow-hidden space-y-0.5">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-spotify-green text-sm shrink-0">🎵</span>
+                            <span class="font-semibold text-diary-text text-xs sm:text-sm truncate">${item.title}</span>
+                        </div>
+                        <p class="text-[11px] text-gray-500 pl-6">Đã chọn ngày: <span class="font-medium text-diary-blue">${chosenDateStr}</span></p>
+                    </div>
+                    <div class="flex items-center space-x-1.5 text-xs shrink-0 pl-6 sm:pl-0">
+                        ${embedUrl ? `<button onclick="playMusicInLibrary('${embedUrl}')" class="px-2.5 py-1 bg-spotify-green/15 text-spotify-green font-semibold rounded-lg hover:bg-spotify-green/25 transition">Nghe</button>` : ''}
+                        <button onclick="openMusicNameModal('${item.dateKey}')" class="px-2.5 py-1 bg-gray-200 text-diary-text font-medium rounded-lg hover:bg-gray-300 transition">Đặt tên</button>
+                        <button onclick="openView('${item.dateKey}', false)" class="px-2.5 py-1 bg-diary-blue/10 text-diary-blue font-medium rounded-lg hover:bg-diary-blue/20 transition">Xem bài</button>
+                    </div>
+                `;
+                listEl.appendChild(row);
+            });
+
+            if (shouldFetchDefaultNames) {
+                resolveDefaultSpotifyTitles(musicItems);
+            }
+        }
+
+        function playMusicInLibrary(embedUrl) {
+            const previewBox = document.getElementById('music-preview-box');
+            const previewIframe = document.getElementById('music-library-iframe');
+            previewIframe.src = embedUrl;
+            previewBox.classList.remove('hidden');
+        }
+
+        function openMusicNameModal(dateKey) {
+            editingMusicDateKey = dateKey;
+            let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
+            let entryData = entries[dateKey];
+            let spotifyUrl = (typeof entryData === 'object' && entryData !== null && entryData.spotify) ? entryData.spotify.trim() : '';
+            let dateObj = new Date(dateKey + 'T00:00:00');
+            document.getElementById('music-name-date-label').innerText = `Ngày đã chọn: ${dateObj.toLocaleDateString('vi-VN')}`;
+            const input = document.getElementById('music-custom-name-input');
+            input.value = getSongTitleForEntry(dateKey, spotifyUrl);
+            document.getElementById('music-name-modal').classList.remove('hidden');
+            setTimeout(() => input.focus(), 50);
+        }
+
+        function closeMusicNameModal() {
+            editingMusicDateKey = null;
+            document.getElementById('music-name-modal').classList.add('hidden');
+        }
+
+        function saveCustomSongName() {
+            if (!editingMusicDateKey) return;
+            let nameVal = document.getElementById('music-custom-name-input').value.trim();
+            let customTitles = JSON.parse(localStorage.getItem('diary_song_titles')) || {};
+            if (nameVal) customTitles[editingMusicDateKey] = nameVal;
+            else delete customTitles[editingMusicDateKey];
+            localStorage.setItem('diary_song_titles', JSON.stringify(customTitles));
+            closeMusicNameModal();
+            renderMusicList(false);
+        }
+
         function handleUnlock() {
             let enteredPin = getPinValue('.pin-box');
             if (enteredPin.length < 3) { alert('Vui lòng nhập đủ 3 chữ số mã PIN!'); return; }
@@ -706,6 +888,7 @@
             archiveScreen.classList.add('hidden');
             calendarScreen.classList.add('hidden');
             timetableScreen.classList.add('hidden');
+            musicScreen.classList.add('hidden');
             mainScreen.classList.remove('hidden');
             previousScreen = 'main-screen';
             setActiveMenu(null);
@@ -936,6 +1119,7 @@
             archiveScreen.classList.add('hidden');
             calendarScreen.classList.add('hidden');
             timetableScreen.classList.add('hidden');
+            musicScreen.classList.add('hidden');
             editorScreen.classList.add('hidden');
             viewScreen.classList.remove('hidden');
             
@@ -1054,6 +1238,7 @@
             mainScreen.classList.add('hidden');
             archiveScreen.classList.add('hidden');
             calendarScreen.classList.add('hidden');
+            musicScreen.classList.add('hidden');
             editorScreen.classList.remove('hidden');
             saveStatus.innerText = '';
             setActiveMenu(null);
@@ -1083,6 +1268,7 @@
             mainScreen.classList.add('hidden');
             viewScreen.classList.add('hidden');
             calendarScreen.classList.add('hidden');
+            musicScreen.classList.add('hidden');
             editorScreen.classList.remove('hidden');
             saveStatus.innerText = '';
             currentActiveDate = date;
@@ -1131,6 +1317,7 @@
             editorScreen.classList.add('hidden');
             calendarScreen.classList.add('hidden');
             timetableScreen.classList.add('hidden');
+            musicScreen.classList.add('hidden');
             archiveScreen.classList.remove('hidden');
             archiveSearchInput.value = '';
             setActiveMenu('nav-archive');
@@ -1144,6 +1331,7 @@
             editorScreen.classList.add('hidden');
             archiveScreen.classList.add('hidden');
             timetableScreen.classList.add('hidden');
+            musicScreen.classList.add('hidden');
             calendarScreen.classList.remove('hidden');
             setActiveMenu('nav-calendar');
             renderCalendar();
@@ -1402,6 +1590,7 @@
             editorScreen.classList.add('hidden');
             archiveScreen.classList.add('hidden');
             calendarScreen.classList.add('hidden');
+            musicScreen.classList.add('hidden');
             timetableScreen.classList.remove('hidden');
             setActiveMenu('nav-timetable');
             renderTimetable();
