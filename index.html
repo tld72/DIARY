@@ -289,6 +289,15 @@
                         <button id="nav-music" onclick="showMusicScreen()" class="menu-btn w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-diary-text hover:border-[#53D2DC] hover:text-[#53D2DC] transition flex items-center justify-between">
                             <span>Nhạc</span>
                         </button>
+                        <div class="grid grid-cols-2 gap-2 pt-1">
+                            <button type="button" onclick="exportBackupJson()" class="px-2.5 py-2 bg-white border border-gray-200 rounded-xl text-[11px] font-semibold text-diary-text hover:border-[#53D2DC] hover:text-[#53D2DC] transition text-center">
+                                Xuất dữ liệu
+                            </button>
+                            <button type="button" onclick="triggerImportBackupJson()" class="px-2.5 py-2 bg-white border border-gray-200 rounded-xl text-[11px] font-semibold text-diary-text hover:border-[#53D2DC] hover:text-[#53D2DC] transition text-center">
+                                Nhập dữ liệu
+                            </button>
+                        </div>
+                        <input type="file" id="backup-file-input" accept=".json,application/json" onchange="handleImportBackupFile(event)" class="hidden">
                     </div>
                 </div>
                 <div class="p-3.5 bg-white border border-[#53D2DC]/30 rounded-2xl shadow-sm space-y-2">
@@ -453,6 +462,14 @@
     <script>
         // ĐÃ TÍCH HỢP URL GOOGLE APPS SCRIPT MỚI NHẤT CỦA BẠN
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzS83hW2djgkBz0Q5DXZr4hEVd7WBLilscdl8LskYPpnsNqUr30X7lHKPTUJGrSEOnyTg/exec";
+        const BACKUP_KEYS = [
+            'diary_entries',
+            'diary_password',
+            'diary_calendar_data',
+            'diary_timetable_data',
+            'diary_song_titles',
+            'diary_auto_song_titles'
+        ];
         const splashScreen = document.getElementById('splash-screen');
         const lockScreen = document.getElementById('lock-screen');
         const appContainer = document.getElementById('app-container');
@@ -580,6 +597,74 @@
                 }, 500);
             }, 1000);
         });
+
+        // XUẤT & NHẬP DỮ LIỆU SAO LƯU (.JSON) ĐỂ CHUYỂN SANG IPAD
+        function exportBackupJson() {
+            const payload = {
+                app: 'tld',
+                exportedAt: new Date().toISOString(),
+                data: {}
+            };
+            BACKUP_KEYS.forEach(key => {
+                const raw = localStorage.getItem(key);
+                if (raw !== null) {
+                    payload.data[key] = raw;
+                }
+            });
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const todayStr = new Date().toLocaleDateString('en-CA');
+            a.href = url;
+            a.download = `tld-backup-${todayStr}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        function triggerImportBackupJson() {
+            const input = document.getElementById('backup-file-input');
+            if (input) {
+                input.value = '';
+                input.click();
+            }
+        }
+
+        function handleImportBackupFile(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    const sourceData = (parsed && typeof parsed === 'object' && parsed.data && typeof parsed.data === 'object')
+                        ? parsed.data
+                        : parsed;
+                    if (!sourceData || typeof sourceData !== 'object') {
+                        alert('File sao lưu không hợp lệ.');
+                        return;
+                    }
+                    let importedCount = 0;
+                    BACKUP_KEYS.forEach(key => {
+                        if (Object.prototype.hasOwnProperty.call(sourceData, key) && sourceData[key] !== null) {
+                            const valStr = typeof sourceData[key] === 'string' ? sourceData[key] : JSON.stringify(sourceData[key]);
+                            localStorage.setItem(key, valStr);
+                            importedCount++;
+                        }
+                    });
+                    if (importedCount === 0) {
+                        alert('Không tìm thấy dữ liệu của tld trong file này.');
+                        return;
+                    }
+                    alert('Đã nhập dữ liệu thành công! Trang sẽ tải lại để cập nhật.');
+                    window.location.reload();
+                } catch (err) {
+                    alert('Không thể đọc file sao lưu: ' + err.message);
+                }
+            };
+            reader.readAsText(file, 'utf-8');
+        }
 
         // KIỂM TRA BÀI NHẬT KÝ ĐÃ QUÁ 7 NGÀY HAY CHƯA
         function isEntryExpiredForEdit(dateStr) {
