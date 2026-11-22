@@ -528,6 +528,17 @@
             '"Niềm tin vào bản thân là chìa khóa mở mọi cánh cửa thành công."'
         ];
 
+        // ĐƯA VỊ TRÍ CUỘN VỀ ĐẦU CHO CÁC VÙNG CUỘN VÀ TRANG
+        function resetScrollPositions(elements = []) {
+            window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+            elements.forEach(el => {
+                if (el) {
+                    el.scrollTop = 0;
+                    el.scrollLeft = 0;
+                }
+            });
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 splashScreen.classList.add('opacity-0');
@@ -700,6 +711,7 @@
             setActiveMenu(null);
             getRandomQuote();
             loadCurrentWeekDiary();
+            resetScrollPositions([diaryList]);
         }
 
         function getCurrentWeekRange() {
@@ -939,6 +951,7 @@
             viewMood.innerText = moodIcon;
             viewDateTitle.innerText = `Ngày ${formattedDate}`;
             viewContent.innerText = contentText || 'Không có nội dung.';
+            resetScrollPositions([viewContent]);
 
             const editBtn = document.getElementById('view-edit-btn');
             const closeBtn = document.getElementById('view-close-btn');
@@ -978,9 +991,11 @@
             if (previousScreen === 'archive-screen') {
                 archiveScreen.classList.remove('hidden');
                 setActiveMenu('nav-archive');
+                resetScrollPositions([archiveList]);
             } else {
                 mainScreen.classList.remove('hidden');
                 setActiveMenu(null);
+                resetScrollPositions([diaryList]);
             }
         }
 
@@ -1057,6 +1072,7 @@
                 entryContent.value = entryData || '';
                 clearMoodSelection();
             }
+            resetScrollPositions([entryContent]);
         }
 
         function openEdit(date) {
@@ -1083,6 +1099,7 @@
                 spotifyLinkInput.value = '';
                 clearMoodSelection();
             }
+            resetScrollPositions([entryContent]);
         }
 
         function saveEntry() {
@@ -1118,6 +1135,7 @@
             archiveSearchInput.value = '';
             setActiveMenu('nav-archive');
             loadArchiveList();
+            resetScrollPositions([archiveList]);
         }
 
         function showCalendarScreen() {
@@ -1129,6 +1147,7 @@
             calendarScreen.classList.remove('hidden');
             setActiveMenu('nav-calendar');
             renderCalendar();
+            resetScrollPositions([document.getElementById('calendar-grid')]);
         }
 
         function changeCalendarMonth(delta) {
@@ -1386,6 +1405,7 @@
             timetableScreen.classList.remove('hidden');
             setActiveMenu('nav-timetable');
             renderTimetable();
+            resetScrollPositions([timetableScreen.querySelector('.max-h-\\[300px\\]')]);
         }
     </script>
 </body>
