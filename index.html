@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="tld">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>tld</title>
     
     <!-- TỐI ƯU SEO & OPEN GRAPH (HIỂN THỊ KHI CHIA SẺ LINK) -->
@@ -10,9 +13,10 @@
     <meta property="og:title" content="tld">
     <meta property="og:image" content="https://cdn.phototourl.com/member/2026-11-01-4ccc1fd3-8c03-4211-b027-4f6c30fccfdc.png">
     
-    <!-- ICON TRÊN TAB TRÌNH DUYỆT WEB -->
+    <!-- ICON TRÊN TAB TRÌNH DUYỆT WEB (GIỮ NGUYÊN) -->
     <link rel="icon" type="image/png" href="https://cdn.phototourl.com/member/2026-11-01-4ccc1fd3-8c03-4211-b027-4f6c30fccfdc.png">
-    <link rel="apple-touch-icon" href="https://cdn.phototourl.com/member/2026-11-01-4ccc1fd3-8c03-4211-b027-4f6c30fccfdc.png">
+    <!-- ICON MÀN HÌNH CHÍNH IOS / ANDROID (NỀN TRẮNG) -->
+    <link id="apple-home-icon" rel="apple-touch-icon" sizes="180x180" href="https://cdn.phototourl.com/member/2026-11-01-4ccc1fd3-8c03-4211-b027-4f6c30fccfdc.png">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -304,6 +308,9 @@
                         <button id="nav-music" onclick="showMusicScreen()" class="menu-btn w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-diary-text hover:border-[#53D2DC] hover:text-[#53D2DC] transition flex items-center justify-between">
                             <span>Nhạc</span>
                         </button>
+                        <button type="button" onclick="openChangePasswordModal()" class="w-full text-left px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium text-diary-text hover:border-[#53D2DC] hover:text-[#53D2DC] transition flex items-center justify-between">
+                            <span>Đổi mật khẩu</span>
+                        </button>
                         <div class="grid grid-cols-2 gap-2 pt-1">
                             <button type="button" onclick="exportBackupJson()" class="px-2.5 py-2 bg-white border border-gray-200 rounded-xl text-[11px] font-semibold text-diary-text hover:border-[#53D2DC] hover:text-[#53D2DC] transition text-center">
                                 Xuất dữ liệu
@@ -319,6 +326,47 @@
                     <div class="flex items-center space-x-1.5 text-[#53D2DC] font-semibold text-xs"><span>Động lực mỗi ngày</span></div>
                     <p id="daily-quote" class="text-xs text-diary-text italic leading-relaxed font-medium">"Hãy kiên trì từng chút một, mỗi ngày bạn viết nên một trang đời rực rỡ."</p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ĐỔI MẬT KHẨU (MÃ PIN 3 SỐ) -->
+    <div id="change-password-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4 shadow-xl border border-gray-100 text-center">
+            <h3 class="text-sm font-bold text-diary-blue">Đổi mã PIN</h3>
+
+            <div class="space-y-1 text-left">
+                <label class="text-[11px] font-semibold text-gray-500">Mã PIN hiện tại (3 số):</label>
+                <div class="flex justify-center space-x-3 pt-1">
+                    <input type="password" maxlength="1" class="old-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveChangePinNext(this, '.old-pin', 1, '.new-pin')">
+                    <input type="password" maxlength="1" class="old-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveChangePinNext(this, '.old-pin', 2, '.new-pin')">
+                    <input type="password" maxlength="1" class="old-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveChangePinNext(this, '.old-pin', 3, '.new-pin')">
+                </div>
+            </div>
+
+            <div class="space-y-1 text-left">
+                <label class="text-[11px] font-semibold text-gray-500">Mã PIN mới (3 số):</label>
+                <div class="flex justify-center space-x-3 pt-1">
+                    <input type="password" maxlength="1" class="new-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveChangePinNext(this, '.new-pin', 1, '.confirm-pin')">
+                    <input type="password" maxlength="1" class="new-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveChangePinNext(this, '.new-pin', 2, '.confirm-pin')">
+                    <input type="password" maxlength="1" class="new-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveChangePinNext(this, '.new-pin', 3, '.confirm-pin')">
+                </div>
+            </div>
+
+            <div class="space-y-1 text-left">
+                <label class="text-[11px] font-semibold text-gray-500">Nhập lại mã PIN mới (3 số):</label>
+                <div class="flex justify-center space-x-3 pt-1">
+                    <input type="password" maxlength="1" class="confirm-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveChangePinNext(this, '.confirm-pin', 1, null)">
+                    <input type="password" maxlength="1" class="confirm-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveChangePinNext(this, '.confirm-pin', 2, null)">
+                    <input type="password" maxlength="1" class="confirm-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveChangePinNext(this, '.confirm-pin', 3, null)" onkeydown="if(event.key==='Enter') saveNewPassword()">
+                </div>
+            </div>
+
+            <p id="change-pin-status" class="text-center text-xs text-red-500 h-4 font-medium"></p>
+
+            <div class="flex space-x-2.5 pt-1">
+                <button onclick="closeChangePasswordModal()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold text-xs sm:text-sm hover:bg-gray-200 transition">Hủy</button>
+                <button onclick="saveNewPassword()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold text-xs sm:text-sm hover:bg-blue-900 transition shadow-sm">Lưu PIN mới</button>
             </div>
         </div>
     </div>
@@ -462,7 +510,7 @@
     </div>
 
     <script>
-        // URL WEB APP TỪ BẢN TRIỂN KHAI MỚI NHẤT CỦA BẠN
+        const APP_LOGO_URL = "https://cdn.phototourl.com/member/2026-11-01-4ccc1fd3-8c03-4211-b027-4f6c30fccfdc.png";
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGfoSb6iuSYIELnXjDd6sYAhayNZT-sOhw4GqqhWrN5PmTOPvYpN5psZGFDT0WNUprwg/exec";
         const BACKUP_KEYS = [
             'diary_entries',
@@ -579,6 +627,38 @@
             '"Niềm tin vào bản thân là chìa khóa mở mọi cánh cửa thành công."'
         ];
 
+        // TẠO ICON MÀN HÌNH CHÍNH IOS / ANDROID CÓ NỀN TRẮNG THAY VÌ NỀN ĐEN
+        function applyWhiteBackgroundHomeIcon() {
+            const appleIconLink = document.getElementById('apple-home-icon');
+            if (!appleIconLink) return;
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function() {
+                try {
+                    const size = 180;
+                    const canvas = document.createElement('canvas');
+                    canvas.width = size;
+                    canvas.height = size;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(0, 0, size, size);
+
+                    const padding = 22;
+                    const maxW = size - padding * 2;
+                    const maxH = size - padding * 2;
+                    const ratio = Math.min(maxW / img.width, maxH / img.height);
+                    const drawW = img.width * ratio;
+                    const drawH = img.height * ratio;
+                    const drawX = (size - drawW) / 2;
+                    const drawY = (size - drawH) / 2;
+                    ctx.drawImage(img, drawX, drawY, drawW, drawH);
+
+                    appleIconLink.href = canvas.toDataURL('image/png');
+                } catch (e) {}
+            };
+            img.src = APP_LOGO_URL;
+        }
+
         function resetScrollPositions(elements = []) {
             window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
             elements.forEach(el => {
@@ -676,6 +756,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            applyWhiteBackgroundHomeIcon();
             pullFromCloudSync(false);
             setTimeout(() => {
                 splashScreen.classList.add('opacity-0');
@@ -687,6 +768,61 @@
                 }, 500);
             }, 1000);
         });
+
+        // ĐỔI MẬT KHẨU (MÃ PIN 3 SỐ)
+        function openChangePasswordModal() {
+            document.querySelectorAll('.old-pin, .new-pin, .confirm-pin').forEach(el => el.value = '');
+            document.getElementById('change-pin-status').innerText = '';
+            document.getElementById('change-password-modal').classList.remove('hidden');
+            const firstOld = document.querySelector('.old-pin');
+            if (firstOld) firstOld.focus();
+        }
+
+        function closeChangePasswordModal() {
+            document.getElementById('change-password-modal').classList.add('hidden');
+        }
+
+        function moveChangePinNext(el, groupSelector, index, nextGroupSelector) {
+            if (el.value.length === 1) {
+                const groupInputs = document.querySelectorAll(groupSelector);
+                if (index < groupInputs.length) {
+                    groupInputs[index].focus();
+                } else if (nextGroupSelector) {
+                    const nextFirst = document.querySelector(nextGroupSelector);
+                    if (nextFirst) nextFirst.focus();
+                }
+            }
+        }
+
+        function saveNewPassword() {
+            const statusEl = document.getElementById('change-pin-status');
+            let oldPin = '';
+            document.querySelectorAll('.old-pin').forEach(el => oldPin += el.value);
+            let newPin = '';
+            document.querySelectorAll('.new-pin').forEach(el => newPin += el.value);
+            let confirmPin = '';
+            document.querySelectorAll('.confirm-pin').forEach(el => confirmPin += el.value);
+
+            const savedPass = localStorage.getItem('diary_password');
+
+            if (oldPin.length < 3 || newPin.length < 3 || confirmPin.length < 3) {
+                statusEl.innerText = 'Vui lòng nhập đủ 3 số cho cả 3 ô!';
+                return;
+            }
+            if (savedPass && oldPin !== savedPass) {
+                statusEl.innerText = 'Mã PIN hiện tại không đúng!';
+                return;
+            }
+            if (newPin !== confirmPin) {
+                statusEl.innerText = 'Mã PIN mới nhập lại chưa khớp!';
+                return;
+            }
+
+            localStorage.setItem('diary_password', newPin);
+            pushToCloudSync();
+            closeChangePasswordModal();
+            alert('Đã đổi mã PIN thành công!');
+        }
 
         function exportBackupJson() {
             const payload = {
@@ -952,7 +1088,6 @@
                 autoAdvanceTimer = null;
             }
             if (!isContinuousPlayActive) return;
-            // Tự chuyển sang bài kế tiếp sau mỗi 3 phút 30 giây khi bật chế độ nghe liên tục
             autoAdvanceTimer = setTimeout(() => {
                 if (isContinuousPlayActive) {
                     playNextTrack(true);
@@ -965,7 +1100,6 @@
             const total = currentMusicItems.length;
             let safeIndex = ((index % total) + total) % total;
 
-            // Tìm bài có link embed hợp lệ
             let attempts = 0;
             while (!getSpotifyEmbedUrl(currentMusicItems[safeIndex].spotifyUrl) && attempts < total) {
                 safeIndex = (safeIndex + 1) % total;
