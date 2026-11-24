@@ -45,7 +45,6 @@
         .animate-progress { animation: loadingProgress 1s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
         @keyframes flipCardAnimation { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(180deg); } }
         .animate-flip-card { animation: flipCardAnimation 1s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-
         /* HIỆU ỨNG LẮC ỐNG TRƠN PASTEL */
         @keyframes pastelCupShake {
             0%, 100% { transform: rotate(0deg) translateY(0); }
@@ -60,7 +59,6 @@
             transform-origin: bottom center;
             animation: pastelCupShake 0.55s ease-in-out infinite;
         }
-
         /* QUE XĂM BẤT NGỜ TRỒI LÊN KHỎI MIỆNG ỐNG */
         @keyframes stickPopUp {
             0% { transform: translate(-50%, 34px) rotate(-6deg) scale(0.85); opacity: 0; }
@@ -71,7 +69,6 @@
         .animate-stick-pop {
             animation: stickPopUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
-
         /* HIỆU ỨNG MỞ THẺ QUẺ TỪ TỪ */
         @keyframes unfoldFortuneScroll {
             0% { transform: scaleY(0.15) scaleX(0.75); opacity: 0; }
@@ -84,7 +81,7 @@
         }
     </style>
 </head>
-<body class="bg-diary-bg min-h-screen w-screen overflow-x-hidden flex items-center justify-center p-2 sm:p-6 font-sans relative">
+<body class="bg-diary-bg h-screen w-screen overflow-hidden flex items-center justify-center p-2 sm:p-4 font-sans relative">
     
     <!-- 0. SPLASH SCREEN -->
     <div id="splash-screen" class="fixed inset-0 bg-diary-bg z-50 flex flex-col items-center justify-center p-4 transition-opacity duration-500">
@@ -116,11 +113,11 @@
     </div>
 
     <!-- KHUNG GIAO DIỆN CHÍNH -->
-    <div id="app-container" class="hidden w-full max-w-full sm:max-w-5xl bg-white rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden border border-gray-100 p-3 sm:p-7 flex flex-col justify-between z-10 mx-2 my-auto">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 items-start">
+    <div id="app-container" class="hidden w-full max-w-full sm:max-w-5xl max-h-full bg-white rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden border border-gray-100 p-3 sm:p-6 flex flex-col justify-between z-10 mx-2 min-h-0">
+        <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 items-stretch min-h-0">
             
-            <div class="md:col-span-2 space-y-3.5">
-                <div class="flex justify-between items-center pb-2 border-b border-gray-100">
+            <div class="md:col-span-2 flex flex-col justify-between space-y-3.5 min-h-0">
+                <div class="flex justify-between items-center pb-2 border-b border-gray-100 shrink-0">
                     <div class="flex items-center space-x-2.5">
                         <h1 id="brand-tld-header" onclick="handleSingleTldClick()" ondblclick="triggerPrivateUnlockPrompt()" class="text-2xl font-bold text-[#53D2DC] tracking-wide cursor-pointer hover:opacity-80 transition select-none">tld</h1>
                         <span id="sync-status-badge" onclick="pullFromCloudSync(true)" class="text-[11px] text-gray-400 cursor-pointer hover:text-diary-blue transition" title="Bấm để tải lại dữ liệu từ Drive"></span>
@@ -129,21 +126,21 @@
                 </div>
 
                 <!-- 1. MÀN HÌNH CHÍNH -->
-                <div id="main-screen" class="space-y-3">
-                    <div class="flex items-center justify-between">
+                <div id="main-screen" class="flex-1 flex flex-col space-y-3 min-h-0">
+                    <div class="flex items-center justify-between shrink-0">
                         <span class="text-xs font-semibold text-diary-blue uppercase tracking-wider">Nhật ký tuần này</span>
                         <span id="current-week-label" class="text-xs text-gray-400"></span>
                     </div>
-                    <button onclick="openNewEditor()" class="w-full bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm flex items-center justify-center space-x-2">
+                    <button onclick="openNewEditor()" class="w-full bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm flex items-center justify-center space-x-2 shrink-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         <span>Viết nhật ký mới</span>
                     </button>
-                    <div id="diary-list" class="space-y-2.5 max-h-[240px] sm:max-h-[280px] overflow-y-auto pr-1"></div>
+                    <div id="diary-list" class="flex-1 space-y-2.5 min-h-0 overflow-y-auto pr-1"></div>
                 </div>
 
                 <!-- 2. MÀN HÌNH XEM CHI TIẾT -->
-                <div id="view-screen" class="hidden space-y-3">
-                    <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                <div id="view-screen" class="hidden flex-1 flex flex-col space-y-3 min-h-0">
+                    <div class="flex justify-between items-center border-b border-gray-100 pb-2 shrink-0">
                         <div class="flex items-center space-x-2 overflow-hidden pr-2">
                             <span id="view-mood" class="text-lg shrink-0"></span>
                             <span id="view-date-title" class="font-semibold text-diary-blue text-xs sm:text-sm truncate"></span>
@@ -156,33 +153,31 @@
                             </svg>
                         </button>
                     </div>
-
                     <!-- BANNER GIEO QUẺ KÝ ỨC -->
-                    <div id="random-memory-banner" class="hidden px-3 py-2 bg-cyan-50/80 border border-[#53D2DC]/40 rounded-xl text-xs text-cyan-900 flex items-center justify-between gap-2">
+                    <div id="random-memory-banner" class="hidden px-3 py-2 bg-cyan-50/80 border border-[#53D2DC]/40 rounded-xl text-xs text-cyan-900 flex items-center justify-between gap-2 shrink-0">
                         <span id="random-memory-caption" class="font-medium"></span>
                         <button onclick="startDrawMemoryEffect()" class="px-2.5 py-1 bg-white border border-[#53D2DC] text-[#53D2DC] rounded-lg font-semibold hover:bg-[#53D2DC] hover:text-white transition shrink-0 text-[11px]">Rút quẻ khác</button>
                     </div>
                     
-                    <div id="view-content" class="w-full p-3.5 bg-gray-50 border border-diary-border rounded-xl h-36 overflow-y-auto text-diary-text text-sm whitespace-pre-wrap leading-relaxed"></div>
+                    <div id="view-content" class="flex-1 w-full p-3.5 bg-gray-50 border border-diary-border rounded-xl min-h-0 overflow-y-auto text-diary-text text-sm whitespace-pre-wrap leading-relaxed"></div>
                     
-                    <div id="spotify-player-container" class="hidden">
+                    <div id="spotify-player-container" class="hidden shrink-0">
                         <iframe id="spotify-iframe" style="border-radius:12px" src="" width="100%" height="80" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
                     </div>
-                    <div class="flex space-x-2 sm:space-x-3 pt-1">
+                    <div class="flex space-x-2 sm:space-x-3 pt-1 shrink-0">
                         <button id="view-edit-btn" onclick="switchToEditFromView()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-xs sm:text-sm">Sửa bài này</button>
                         <button id="view-close-btn" onclick="closeViewScreen()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-xs sm:text-sm">Đóng</button>
                     </div>
                 </div>
 
                 <!-- 3. MÀN HÌNH SOẠN THẢO -->
-                <div id="editor-screen" class="hidden space-y-2.5">
-                    <div class="flex justify-between items-center">
+                <div id="editor-screen" class="hidden flex-1 flex flex-col space-y-2.5 min-h-0">
+                    <div class="flex justify-between items-center shrink-0">
                         <input type="date" id="entry-date" onchange="checkLastWeekMemory(this.value)" class="border border-diary-border bg-gray-50 px-3 py-1.5 rounded-xl text-xs text-diary-text focus:outline-none focus:ring-2 focus:ring-diary-blue/30">
                         <button type="button" onclick="goToMain()" class="text-xs text-gray-400 hover:text-diary-text px-2 py-1">Hủy</button>
                     </div>
-
                     <!-- HỘP GỢI NHẮC KÝ ỨC CÙNG NGÀY TUẦN TRƯỚC -->
-                    <div id="last-week-memory-box" class="hidden p-2.5 bg-cyan-50/70 border border-[#53D2DC]/40 rounded-xl space-y-1">
+                    <div id="last-week-memory-box" class="hidden p-2.5 bg-cyan-50/70 border border-[#53D2DC]/40 rounded-xl space-y-1 shrink-0">
                         <div class="flex items-center justify-between">
                             <span id="last-week-memory-title" class="text-[11px] font-bold text-diary-blue"></span>
                             <button type="button" id="last-week-view-btn" class="text-[11px] font-semibold text-[#53D2DC] hover:underline">Đọc đầy đủ</button>
@@ -190,7 +185,7 @@
                         <p id="last-week-memory-preview" class="text-xs text-diary-text line-clamp-2 italic"></p>
                     </div>
                     
-                    <div class="flex items-center space-x-1.5 sm:space-x-2 bg-gray-50 px-3 py-1.5 border border-diary-border rounded-xl overflow-x-auto">
+                    <div class="flex items-center space-x-1.5 sm:space-x-2 bg-gray-50 px-3 py-1.5 border border-diary-border rounded-xl overflow-x-auto shrink-0">
                         <span class="text-xs text-diary-text font-medium mr-1 shrink-0">Tâm trạng:</span>
                         <button type="button" onclick="setMood('😊')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base shrink-0" data-mood="😊">😊</button>
                         <button type="button" onclick="setMood('😌')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base shrink-0" data-mood="😌">😌</button>
@@ -198,36 +193,36 @@
                         <button type="button" onclick="setMood('🔥')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base shrink-0" data-mood="🔥">🔥</button>
                         <button type="button" onclick="setMood('🤔')" class="mood-btn p-1 rounded-lg hover:bg-gray-200 transition text-base shrink-0" data-mood="🤔">🤔</button>
                     </div>
-                    <div class="relative flex items-center">
+                    <div class="relative flex items-center shrink-0">
                         <span class="absolute left-3 text-spotify-green font-bold text-sm">🎵</span>
                         <input type="text" id="spotify-link-input" onkeydown="handleSpotifyKey(event)" class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-diary-border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-spotify-green/30 text-diary-text">
                     </div>
-                    <textarea id="entry-content" rows="4" class="w-full p-3 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 resize-none text-diary-text text-sm leading-relaxed"></textarea>
+                    <textarea id="entry-content" rows="4" class="flex-1 min-h-[120px] w-full p-3 bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-diary-blue/30 resize-none text-diary-text text-sm leading-relaxed"></textarea>
                     
-                    <button onclick="saveEntry()" class="w-full bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">Lưu nhật ký</button>
-                    <p id="save-status" class="text-center text-xs text-diary-blue h-3 font-medium"></p>
+                    <button onclick="saveEntry()" class="w-full bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm shrink-0">Lưu nhật ký</button>
+                    <p id="save-status" class="text-center text-xs text-diary-blue h-3 font-medium shrink-0"></p>
                 </div>
 
                 <!-- 4. KHO TÀNG KÝ ỨC (DẠNG Ô NHỎ GỌN) -->
-                <div id="archive-screen" class="hidden space-y-3">
-                    <div class="flex justify-between items-center border-b border-gray-100 pb-2 gap-2">
+                <div id="archive-screen" class="hidden flex-1 flex flex-col space-y-3 min-h-0">
+                    <div class="flex justify-between items-center border-b border-gray-100 pb-2 gap-2 shrink-0">
                         <h2 class="text-sm font-semibold text-diary-blue">Kho tàng ký ức</h2>
                         <button onclick="startDrawMemoryEffect()" class="px-3 py-1 bg-[#53D2DC]/15 text-diary-blue border border-[#53D2DC]/40 rounded-xl text-xs font-semibold hover:bg-[#53D2DC] hover:text-white transition shrink-0">
                             Gieo quẻ ký ức
                         </button>
                     </div>
-                    <div class="relative">
+                    <div class="relative shrink-0">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </span>
                         <input type="text" id="archive-search-input" oninput="loadArchiveList()" onkeydown="handleArchiveSearchKey(event)" class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-diary-border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text">
                     </div>
-                    <div id="archive-list" class="space-y-3.5 max-h-[240px] sm:max-h-[280px] overflow-y-auto pr-1"></div>
+                    <div id="archive-list" class="flex-1 space-y-3.5 min-h-0 overflow-y-auto pr-1"></div>
                 </div>
 
                 <!-- 5. LỊCH NGỌT NGÀO -->
-                <div id="calendar-screen" class="hidden space-y-3">
-                    <div class="flex flex-wrap justify-between items-center border-b border-gray-100 pb-2 gap-2">
+                <div id="calendar-screen" class="hidden flex-1 flex flex-col space-y-3 min-h-0">
+                    <div class="flex flex-wrap justify-between items-center border-b border-gray-100 pb-2 gap-2 shrink-0">
                         <h2 class="text-sm font-semibold text-diary-blue">Lịch ngọt ngào</h2>
                         <div class="flex items-center space-x-1.5">
                             <button onclick="changeCalendarMonth(-1)" class="w-7 h-7 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 text-diary-text font-bold text-xs transition" title="Tháng trước">&lt;</button>
@@ -236,21 +231,21 @@
                             <button onclick="resetCalendarToToday()" class="px-2 py-1 rounded-lg bg-cyan-50 text-diary-blue border border-cyan-200 hover:bg-cyan-100 text-[11px] font-semibold transition">Hôm nay</button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold text-gray-400 pb-0.5">
+                    <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold text-gray-400 pb-0.5 shrink-0">
                         <div>T2</div><div>T3</div><div>T4</div><div>T5</div><div>T6</div><div>T7</div><div>CN</div>
                     </div>
-                    <div id="calendar-grid" class="grid grid-cols-7 gap-1.5 max-h-[240px] sm:max-h-[260px] overflow-y-auto p-1"></div>
+                    <div id="calendar-grid" class="flex-1 grid grid-cols-7 auto-rows-fr gap-1.5 min-h-0 overflow-y-auto p-1"></div>
                 </div>
 
                 <!-- 6. THỜI KHÓA BIỂU -->
-                <div id="timetable-screen" class="hidden space-y-3">
-                    <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                <div id="timetable-screen" class="hidden flex-1 flex flex-col space-y-3 min-h-0">
+                    <div class="flex justify-between items-center border-b border-gray-100 pb-2 shrink-0">
                         <h2 class="text-sm font-semibold text-diary-blue">Thời khóa biểu lớp 7</h2>
                         <button onclick="openTimetableModal()" class="px-3 py-1 bg-cyan-50 text-diary-blue border border-cyan-200 rounded-xl text-xs font-semibold hover:bg-cyan-100 transition">
                             Sửa TKB
                         </button>
                     </div>
-                    <div class="max-h-[300px] overflow-y-auto overflow-x-auto pr-1">
+                    <div class="flex-1 min-h-0 overflow-y-auto overflow-x-auto pr-1">
                         <table class="w-full min-w-[500px] text-left text-[11px] border-collapse">
                             <thead>
                                 <tr class="bg-cyan-50 text-cyan-900 border-b border-cyan-100">
@@ -267,8 +262,8 @@
                 </div>
 
                 <!-- 7. MỤC NHẠC ĐÃ CHỌN -->
-                <div id="music-screen" class="hidden space-y-3">
-                    <div class="flex justify-between items-center border-b border-gray-100 pb-2 gap-2">
+                <div id="music-screen" class="hidden flex-1 flex flex-col space-y-3 min-h-0">
+                    <div class="flex justify-between items-center border-b border-gray-100 pb-2 gap-2 shrink-0">
                         <h2 class="text-sm font-semibold text-diary-blue">Nhạc đã chọn</h2>
                         <div class="flex items-center gap-2">
                             <span id="music-count-badge" class="text-[11px] text-gray-400"></span>
@@ -277,7 +272,7 @@
                             </button>
                         </div>
                     </div>
-                    <div id="music-preview-box" class="hidden rounded-xl border border-gray-100 bg-gray-50 p-2.5 space-y-2">
+                    <div id="music-preview-box" class="hidden rounded-xl border border-gray-100 bg-gray-50 p-2.5 space-y-2 shrink-0">
                         <div class="flex items-center justify-between gap-2 text-xs">
                             <span id="music-now-playing-label" class="font-semibold text-diary-text truncate"></span>
                             <div class="flex items-center gap-1.5 shrink-0">
@@ -287,12 +282,12 @@
                         </div>
                         <iframe id="music-library-iframe" style="border-radius:10px" src="" width="100%" height="80" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
                     </div>
-                    <div id="music-list" class="space-y-2 max-h-[240px] sm:max-h-[280px] overflow-y-auto pr-1"></div>
+                    <div id="music-list" class="flex-1 space-y-2 min-h-0 overflow-y-auto pr-1"></div>
                 </div>
             </div>
 
             <!-- CỘT PHẢI (SIDEBAR) -->
-            <div class="md:col-span-1 bg-gray-50 p-3.5 sm:p-5 rounded-2xl border border-gray-100 flex flex-col justify-between space-y-4">
+            <div class="md:col-span-1 bg-gray-50 p-3.5 sm:p-5 rounded-2xl border border-gray-100 flex flex-col justify-between space-y-4 min-h-0">
                 <div class="space-y-3">
                     <h3 class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Cài đặt & Tiện ích</h3>
                     <div class="space-y-2">
@@ -337,7 +332,6 @@
     <div id="change-password-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4 shadow-xl border border-gray-100 text-center">
             <h3 class="text-sm font-bold text-diary-blue">Đổi mã PIN</h3>
-
             <div class="space-y-1 text-left">
                 <label class="text-[11px] font-semibold text-gray-500">Mã PIN hiện tại (3 số):</label>
                 <div class="flex justify-center space-x-3 pt-1">
@@ -346,7 +340,6 @@
                     <input type="password" maxlength="1" class="old-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveChangePinNext(this, '.old-pin', 3, '.new-pin')">
                 </div>
             </div>
-
             <div class="space-y-1 text-left">
                 <label class="text-[11px] font-semibold text-gray-500">Mã PIN mới (3 số):</label>
                 <div class="flex justify-center space-x-3 pt-1">
@@ -355,7 +348,6 @@
                     <input type="password" maxlength="1" class="new-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveChangePinNext(this, '.new-pin', 3, '.confirm-pin')">
                 </div>
             </div>
-
             <div class="space-y-1 text-left">
                 <label class="text-[11px] font-semibold text-gray-500">Nhập lại mã PIN mới (3 số):</label>
                 <div class="flex justify-center space-x-3 pt-1">
@@ -364,9 +356,7 @@
                     <input type="password" maxlength="1" class="confirm-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveChangePinNext(this, '.confirm-pin', 3, null)" onkeydown="if(event.key==='Enter') saveNewPassword()">
                 </div>
             </div>
-
             <p id="change-pin-status" class="text-center text-xs text-red-500 h-4 font-medium"></p>
-
             <div class="flex space-x-2.5 pt-1">
                 <button onclick="closeChangePasswordModal()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold text-xs sm:text-sm hover:bg-gray-200 transition">Hủy</button>
                 <button onclick="saveNewPassword()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold text-xs sm:text-sm hover:bg-blue-900 transition shadow-sm">Lưu PIN mới</button>
@@ -402,7 +392,6 @@
     <div id="timetable-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-6 w-full max-w-md space-y-4 shadow-xl border border-gray-100">
             <h3 class="text-sm font-bold text-diary-blue text-center">Sửa ô Thời khóa biểu</h3>
-
             <div class="grid grid-cols-2 gap-2.5 text-left">
                 <div>
                     <label class="text-[11px] font-semibold text-gray-500">Chọn Thứ:</label>
@@ -424,7 +413,6 @@
                     </select>
                 </div>
             </div>
-
             <div class="space-y-1.5 text-left">
                 <label class="text-[11px] font-semibold text-gray-500">Kiểu hiển thị ô:</label>
                 <div class="grid grid-cols-2 gap-2">
@@ -432,7 +420,6 @@
                     <button type="button" id="tt-mode-split" onclick="setTimetableMode('split')" class="py-2 px-2.5 rounded-xl border text-xs font-semibold transition">2 ô nhỏ (chia đôi)</button>
                 </div>
             </div>
-
             <!-- FORM 1 Ô LỚN (TỰ ĐỘNG THEO GIỜ CA HỌC) -->
             <div id="tt-single-fields" class="space-y-2 text-left">
                 <div>
@@ -440,7 +427,6 @@
                     <input type="text" id="tt-single-name" onkeydown="if(event.key==='Enter') saveTimetableSlot()" class="w-full mt-1 p-2.5 bg-gray-50 border border-diary-border rounded-xl text-xs text-diary-text">
                 </div>
             </div>
-
             <!-- FORM 2 Ô NHỎ -->
             <div id="tt-split-fields" class="hidden space-y-2 text-left">
                 <div>
@@ -452,7 +438,6 @@
                     <input type="text" id="tt-split-bottom" onkeydown="if(event.key==='Enter') saveTimetableSlot()" class="w-full mt-1 p-2 bg-gray-50 border border-diary-border rounded-xl text-xs text-diary-text">
                 </div>
             </div>
-
             <div class="flex space-x-2.5 pt-1">
                 <button onclick="closeTimetableModal()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold text-xs hover:bg-gray-200 transition">Hủy</button>
                 <button onclick="saveTimetableSlot()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold text-xs hover:bg-blue-900 transition shadow-sm">Lưu ô TKB</button>
@@ -464,7 +449,6 @@
     <div id="draw-modal" class="hidden fixed inset-0 bg-black/35 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-3xl p-6 w-full max-w-xs space-y-4 shadow-2xl border border-sky-200 text-center overflow-hidden">
             <p id="draw-stage-title" class="text-xs font-bold uppercase tracking-widest text-sky-700">Đang lắc ống...</p>
-
             <!-- KHU VỰC ỐNG TRƠN + QUE XĂM TRỒI LÊN -->
             <div id="temple-cup-stage" class="relative h-48 flex items-end justify-center pb-2 select-none">
                 <!-- QUE XĂM BẤT NGỜ TRỒI LÊN TỪ MIỆNG ỐNG -->
@@ -473,7 +457,6 @@
                     <span id="popped-stick-mood" class="text-base">✨</span>
                     <span class="text-[8px] font-extrabold text-sky-700 tracking-tighter">QUẺ</span>
                 </div>
-
                 <!-- ỐNG TRƠN XANH DƯƠNG PASTEL NHẠT -->
                 <div id="temple-cup-wrapper" class="relative z-10 w-24 h-28 bg-gradient-to-b from-sky-100 via-sky-200 to-blue-200/90 rounded-b-2xl rounded-t-lg border-2 border-sky-300 shadow-md flex flex-col items-center justify-center animate-cup-shake">
                     <div class="w-full h-2 bg-white/70 border-y border-sky-200 absolute top-2.5"></div>
@@ -483,14 +466,12 @@
                     <div class="w-full h-2 bg-white/70 border-t border-sky-200 absolute bottom-2.5"></div>
                 </div>
             </div>
-
             <!-- TẤM THẺ QUẺ MỞ BUNG TỪ TỪ SAU KHI QUE TRỒI LÊN -->
             <div id="unfolded-fortune-card" class="hidden p-4 bg-gradient-to-b from-sky-50 to-[#F2F9F5] border-2 border-sky-200 rounded-2xl space-y-1.5 shadow-inner">
                 <div id="unfolded-mood" class="text-3xl">✨</div>
                 <p id="unfolded-date" class="text-sm font-bold text-diary-blue"></p>
                 <p id="unfolded-days-ago" class="text-xs text-sky-800 font-medium"></p>
             </div>
-
             <p id="draw-sub-text" class="text-xs text-gray-400 italic">Đợi chút xem điều gì trồi lên nhé...</p>
         </div>
     </div>
@@ -618,7 +599,6 @@
                 { type: 'split', top: 'Mĩ Thuật', bottom: 'Âm Nhạc' }
             ]
         ];
-
         let currentTtMode = 'single';
 
         const motivationalQuotes = [
@@ -635,7 +615,6 @@
         function hideAllArchiveDeleteOverlays() {
             document.querySelectorAll('.archive-delete-overlay').forEach(el => el.classList.add('hidden'));
         }
-
         document.addEventListener('pointerdown', (e) => {
             if (Date.now() - justOpenedDeleteOverlayAt < 120) return;
             if (e.target.closest('.archive-delete-overlay')) return;
@@ -646,7 +625,6 @@
         function isPrivateUnlocked() {
             return localStorage.getItem(PRIVATE_UNLOCKED_FLAG) === '1';
         }
-
         function updateLockButtonVisibility() {
             if (!lockPrivateBtn) return;
             if (isPrivateUnlocked()) {
@@ -655,7 +633,6 @@
                 lockPrivateBtn.classList.add('hidden');
             }
         }
-
         function handleSingleTldClick() {
             if (singleClickTimeout) clearTimeout(singleClickTimeout);
             singleClickTimeout = setTimeout(() => {
@@ -663,7 +640,6 @@
                 goToMain();
             }, 220);
         }
-
         function triggerPrivateUnlockPrompt() {
             if (singleClickTimeout) {
                 clearTimeout(singleClickTimeout);
@@ -678,7 +654,6 @@
             pendingDate = null;
             showAuthModal('Nhập mã PIN');
         }
-
         function unlockPrivateVaultData() {
             const rawVault = localStorage.getItem(PRIVATE_VAULT_KEY);
             if (rawVault) {
@@ -693,18 +668,14 @@
             pullFromCloudSync(false);
             goToMain();
         }
-
         function lockIntoFreshMode() {
             const currentBundle = collectLocalBackupObject();
             localStorage.setItem(PRIVATE_VAULT_KEY, JSON.stringify(currentBundle));
             localStorage.setItem(PRIVATE_UNLOCKED_FLAG, '0');
-
-            // Làm sạch hoàn toàn dữ liệu hiển thị ở chế độ trống không (mỗi máy độc lập, không liên kết Drive)
             localStorage.removeItem('diary_entries');
             localStorage.removeItem('diary_calendar_data');
             localStorage.removeItem('diary_timetable_data');
             localStorage.removeItem('diary_auto_song_titles');
-
             updateLockButtonVisibility();
             refreshActiveViewsAfterSync();
             goToMain();
@@ -714,13 +685,11 @@
         function applyWhiteBackgroundHomeIcon() {
             const appleIconLink = document.getElementById('apple-home-icon');
             if (!appleIconLink) return;
-
             const size = 180;
             const canvas = document.createElement('canvas');
             canvas.width = size;
             canvas.height = size;
             const ctx = canvas.getContext('2d');
-
             function drawFallbackWhiteIcon() {
                 ctx.fillStyle = '#FFFFFF';
                 ctx.fillRect(0, 0, size, size);
@@ -731,16 +700,13 @@
                 ctx.fillText('tld', size / 2, size / 2);
                 appleIconLink.href = canvas.toDataURL('image/png');
             }
-
             drawFallbackWhiteIcon();
-
             const img = new Image();
             img.crossOrigin = 'anonymous';
             img.onload = function() {
                 try {
                     ctx.fillStyle = '#FFFFFF';
                     ctx.fillRect(0, 0, size, size);
-
                     const padding = 22;
                     const maxW = size - padding * 2;
                     const maxH = size - padding * 2;
@@ -750,7 +716,6 @@
                     const drawX = (size - drawW) / 2;
                     const drawY = (size - drawH) / 2;
                     ctx.drawImage(img, drawX, drawY, drawW, drawH);
-
                     appleIconLink.href = canvas.toDataURL('image/png');
                 } catch (e) {
                     drawFallbackWhiteIcon();
@@ -885,11 +850,9 @@
             const firstOld = document.querySelector('.old-pin');
             if (firstOld) firstOld.focus();
         }
-
         function closeChangePasswordModal() {
             document.getElementById('change-password-modal').classList.add('hidden');
         }
-
         function moveChangePinNext(el, groupSelector, index, nextGroupSelector) {
             if (el.value.length === 1) {
                 const groupInputs = document.querySelectorAll(groupSelector);
@@ -901,7 +864,6 @@
                 }
             }
         }
-
         function saveNewPassword() {
             const statusEl = document.getElementById('change-pin-status');
             let oldPin = '';
@@ -910,9 +872,7 @@
             document.querySelectorAll('.new-pin').forEach(el => newPin += el.value);
             let confirmPin = '';
             document.querySelectorAll('.confirm-pin').forEach(el => confirmPin += el.value);
-
             const savedPass = localStorage.getItem('diary_password');
-
             if (oldPin.length < 3 || newPin.length < 3 || confirmPin.length < 3) {
                 statusEl.innerText = 'Vui lòng nhập đủ 3 số cho cả 3 ô!';
                 return;
@@ -925,7 +885,6 @@
                 statusEl.innerText = 'Mã PIN mới nhập lại chưa khớp!';
                 return;
             }
-
             localStorage.setItem('diary_password', newPin);
             pushToCloudSync();
             closeChangePasswordModal();
@@ -1091,25 +1050,21 @@
             if (el.value.length === 1 && boxNum < 3) document.querySelectorAll('.pin-box')[boxNum].focus();
             if (boxNum === 3 && el.value.length === 1) handleUnlock();
         }
-
         function handlePinKey(e, index) {
             let boxes = document.querySelectorAll('.pin-box');
             if (e.key === 'Backspace' && !boxes[index].value && index > 0) boxes[index - 1].focus();
             else if (e.key === 'Enter') handleUnlock();
         }
-
         function moveAuthNext(el, boxNum) {
             if (el.value.length === 1 && boxNum < 3) document.querySelectorAll('.auth-pin')[boxNum].focus();
             if (boxNum === 3 && el.value.length === 1) verifyAuthAction();
         }
-
         function getPinValue(selector) {
             let boxes = document.querySelectorAll(selector);
             let pin = '';
             boxes.forEach(b => pin += b.value);
             return pin;
         }
-
         function clearPins(selector) {
             document.querySelectorAll(selector).forEach(b => b.value = '');
         }
@@ -1134,7 +1089,6 @@
         async function resolveDefaultSpotifyTitles(musicItems) {
             const autoCache = JSON.parse(localStorage.getItem('diary_auto_song_titles')) || {};
             let updated = false;
-
             for (const item of musicItems) {
                 if (!item.spotifyUrl || autoCache[item.spotifyUrl]) continue;
                 try {
@@ -1149,7 +1103,6 @@
                     }
                 } catch (e) {}
             }
-
             if (updated) {
                 localStorage.setItem('diary_auto_song_titles', JSON.stringify(autoCache));
                 pushToCloudSync();
@@ -1178,17 +1131,14 @@
                 alert('Không có bài hát Spotify nào để phát liên tục.');
                 return;
             }
-
             if (isContinuousPlayActive) {
                 stopContinuousPlay();
                 return;
             }
-
             isContinuousPlayActive = true;
             const btn = document.getElementById('music-continuous-btn');
             btn.innerText = 'Đang tự chuyển';
             btn.className = 'px-3 py-1 bg-diary-blue text-white rounded-xl text-xs font-semibold hover:opacity-90 transition';
-
             const startIndex = currentTrackIndex >= 0 ? currentTrackIndex : 0;
             playTrackAtIndex(startIndex);
         }
@@ -1210,26 +1160,21 @@
             if (!currentMusicItems.length) return;
             const total = currentMusicItems.length;
             let safeIndex = ((index % total) + total) % total;
-
             let attempts = 0;
             while (!getSpotifyEmbedUrl(currentMusicItems[safeIndex].spotifyUrl) && attempts < total) {
                 safeIndex = (safeIndex + 1) % total;
                 attempts++;
             }
-
             const item = currentMusicItems[safeIndex];
             const embedUrl = getSpotifyEmbedUrl(item.spotifyUrl);
             if (!embedUrl) return;
-
             currentTrackIndex = safeIndex;
             const previewBox = document.getElementById('music-preview-box');
             const previewIframe = document.getElementById('music-library-iframe');
             const nowPlayingLabel = document.getElementById('music-now-playing-label');
-
             previewIframe.src = embedUrl;
             previewBox.classList.remove('hidden');
             nowPlayingLabel.innerText = `Đang phát (${safeIndex + 1}/${total}): ${item.title}`;
-
             if (isContinuousPlayActive) {
                 scheduleAutoNextTrack();
             }
@@ -1266,11 +1211,9 @@
             const listEl = document.getElementById('music-list');
             const badgeEl = document.getElementById('music-count-badge');
             listEl.innerHTML = '';
-
             let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
             let dates = Object.keys(entries).sort().reverse();
             let musicItems = [];
-
             dates.forEach(dateKey => {
                 let entryData = entries[dateKey];
                 let spotifyUrl = (typeof entryData === 'object' && entryData !== null && entryData.spotify) ? entryData.spotify.trim() : '';
@@ -1282,22 +1225,18 @@
                     });
                 }
             });
-
             currentMusicItems = musicItems;
             badgeEl.innerText = `${musicItems.length} bài`;
-
             if (musicItems.length === 0) {
                 stopContinuousPlay();
                 document.getElementById('music-preview-box').classList.add('hidden');
                 listEl.innerHTML = '<p class="text-center text-gray-400 py-5 text-xs">Chưa có bài hát nào được gắn trong nhật ký.</p>';
                 return;
             }
-
             musicItems.forEach((item, idx) => {
                 let dateObj = new Date(item.dateKey + 'T00:00:00');
                 let chosenDateStr = dateObj.toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' });
                 let embedUrl = getSpotifyEmbedUrl(item.spotifyUrl);
-
                 let row = document.createElement('div');
                 row.className = 'p-3 bg-gray-50 border border-gray-100 rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 hover:bg-gray-100/80 transition';
                 row.innerHTML = `
@@ -1315,7 +1254,6 @@
                 `;
                 listEl.appendChild(row);
             });
-
             if (shouldFetchDefaultNames) {
                 resolveDefaultSpotifyTitles(musicItems);
             }
@@ -1402,10 +1340,8 @@
             let moodIcon = (typeof entryData === 'object' && entryData !== null && entryData.mood) ? entryData.mood : '🙂';
             let dateObj = new Date(date + 'T00:00:00');
             let shortDate = dateObj.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
-
             let tile = document.createElement('div');
             tile.className = 'relative select-none';
-
             let btn = document.createElement('button');
             btn.type = 'button';
             btn.className = 'w-full p-2.5 bg-gray-50 hover:bg-cyan-50/70 border border-gray-200 hover:border-[#53D2DC] rounded-xl transition flex items-center justify-between gap-2';
@@ -1413,7 +1349,6 @@
                 <span class="text-xs font-bold text-diary-blue truncate">${shortDate}</span>
                 <span class="text-base shrink-0">${moodIcon}</span>
             `;
-
             let delBtn = document.createElement('button');
             delBtn.type = 'button';
             delBtn.className = 'archive-delete-overlay hidden absolute inset-0 w-full h-full bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center justify-center z-10';
@@ -1422,27 +1357,22 @@
                 e.stopPropagation();
                 executeDelete(date);
             };
-
             let longPressTimer = null;
             let longPressTriggered = false;
-
             const showDeleteOverlay = () => {
                 longPressTriggered = true;
                 justOpenedDeleteOverlayAt = Date.now();
                 hideAllArchiveDeleteOverlays();
                 delBtn.classList.remove('hidden');
             };
-
             const startPress = () => {
                 longPressTriggered = false;
                 clearTimeout(longPressTimer);
                 longPressTimer = setTimeout(showDeleteOverlay, 480);
             };
-
             const cancelPress = () => {
                 clearTimeout(longPressTimer);
             };
-
             btn.addEventListener('pointerdown', startPress);
             btn.addEventListener('pointerup', cancelPress);
             btn.addEventListener('pointerleave', cancelPress);
@@ -1462,7 +1392,6 @@
                 }
                 openView(date, false);
             });
-
             tile.appendChild(btn);
             tile.appendChild(delBtn);
             container.appendChild(tile);
@@ -1546,7 +1475,6 @@
                 alert('Bạn chưa có bài nhật ký nào để gieo quẻ!');
                 return;
             }
-
             isDrawingMemory = true;
             let candidates = dates.length > 1 ? dates.filter(d => d !== currentActiveDate) : dates;
             let finalDate = candidates[Math.floor(Math.random() * candidates.length)];
@@ -1555,7 +1483,6 @@
             let finalDateObj = new Date(finalDate + 'T00:00:00');
             let diffDays = Math.round((new Date().setHours(0,0,0,0) - finalDateObj.getTime()) / (1000 * 60 * 60 * 24));
             let timeAgoText = diffDays === 0 ? 'Quẻ ký ức từ hôm nay' : (diffDays > 0 ? `Quẻ ký ức từ ${diffDays} ngày trước` : `Quẻ ký ức từ ${Math.abs(diffDays)} ngày tới`);
-
             const drawModal = document.getElementById('draw-modal');
             const stageTitle = document.getElementById('draw-stage-title');
             const cupStage = document.getElementById('temple-cup-stage');
@@ -1567,7 +1494,6 @@
             const unfoldedDate = document.getElementById('unfolded-date');
             const unfoldedDaysAgo = document.getElementById('unfolded-days-ago');
             const subText = document.getElementById('draw-sub-text');
-
             stageTitle.innerText = 'Đang lắc ống...';
             subText.innerText = 'Đợi chút xem điều gì trồi lên nhé...';
             cupStage.classList.remove('hidden');
@@ -1577,7 +1503,6 @@
             unfoldedCard.classList.add('hidden');
             unfoldedCard.classList.remove('animate-unfold-scroll');
             drawModal.classList.remove('hidden');
-
             setTimeout(() => {
                 cupWrapper.classList.remove('animate-cup-shake');
                 stageTitle.innerText = 'Bất ngờ có quẻ trồi lên!';
@@ -1585,7 +1510,6 @@
                 poppedStickMood.innerText = finalMood;
                 poppedStick.classList.remove('hidden');
                 poppedStick.classList.add('animate-stick-pop');
-
                 setTimeout(() => {
                     cupStage.classList.add('hidden');
                     stageTitle.innerText = 'Mở thẻ quẻ ký ức';
@@ -1595,7 +1519,6 @@
                     unfoldedDaysAgo.innerText = timeAgoText;
                     unfoldedCard.classList.remove('hidden');
                     unfoldedCard.classList.add('animate-unfold-scroll');
-
                     setTimeout(() => {
                         drawModal.classList.add('hidden');
                         isDrawingMemory = false;
@@ -1610,19 +1533,15 @@
             const titleEl = document.getElementById('last-week-memory-title');
             const previewEl = document.getElementById('last-week-memory-preview');
             const viewBtn = document.getElementById('last-week-view-btn');
-
             if (!dateStr) {
                 box.classList.add('hidden');
                 return;
             }
-
             let target = new Date(dateStr + 'T00:00:00');
             target.setDate(target.getDate() - 7);
             let prevWeekKey = target.toLocaleDateString('en-CA');
-
             let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
             let prevEntry = entries[prevWeekKey];
-
             if (prevEntry) {
                 let text = typeof prevEntry === 'object' ? (prevEntry.content || '') : prevEntry;
                 let mood = (typeof prevEntry === 'object' && prevEntry.mood) ? prevEntry.mood + ' ' : '';
@@ -1644,7 +1563,6 @@
                 else btn.classList.remove('bg-gray-200', 'ring-2', 'ring-diary-blue/50');
             });
         }
-
         function clearMoodSelection() {
             selectedMood = null;
             document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('bg-gray-200', 'ring-2', 'ring-diary-blue/50'));
@@ -1675,7 +1593,6 @@
             viewDateTitle.innerText = `Ngày ${formattedDate}`;
             viewContent.innerText = contentText || 'Không có nội dung.';
             resetScrollPositions([viewContent]);
-
             const editBtn = document.getElementById('view-edit-btn');
             const closeBtn = document.getElementById('view-close-btn');
             if (isEntryExpiredForEdit(date)) {
@@ -1687,7 +1604,6 @@
                 closeBtn.classList.remove('w-full');
                 closeBtn.classList.add('w-1/2');
             }
-
             const randomBanner = document.getElementById('random-memory-banner');
             const randomCaption = document.getElementById('random-memory-caption');
             if (isRandom) {
@@ -1698,7 +1614,6 @@
             } else {
                 randomBanner.classList.add('hidden');
             }
-
             let embedUrl = getSpotifyEmbedUrl(spotifyUrl);
             if (embedUrl) {
                 spotifyIframe.src = embedUrl;
@@ -1732,7 +1647,6 @@
             pendingDate = date;
             showAuthModal('Nhập mã PIN');
         }
-
         function showAuthModal(title) {
             document.getElementById('auth-modal-title').innerText = title;
             clearPins('.auth-pin');
@@ -1740,13 +1654,11 @@
             document.getElementById('auth-modal').classList.remove('hidden');
             document.querySelectorAll('.auth-pin')[0].focus();
         }
-
         function closeAuthModal() {
             document.getElementById('auth-modal').classList.add('hidden');
             pendingAction = null;
             pendingDate = null;
         }
-
         function verifyAuthAction() {
             let enteredPin = getPinValue('.auth-pin');
             let savedPass = localStorage.getItem('diary_password');
@@ -1913,7 +1825,7 @@
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const calData = JSON.parse(localStorage.getItem('diary_calendar_data')) || {};
             let emptyCells = firstDay === 0 ? 6 : firstDay - 1;
-            for (let i = 0; i < emptyCells; i++) grid.innerHTML += `<div class="h-14 bg-transparent"></div>`;
+            for (let i = 0; i < emptyCells; i++) grid.innerHTML += `<div class="min-h-[52px] bg-transparent"></div>`;
             for (let day = 1; day <= daysInMonth; day++) {
                 let monthStr = String(month + 1).padStart(2, '0');
                 let dayStr = String(day).padStart(2, '0');
@@ -1923,13 +1835,11 @@
                 let tagKey = dayData.tag || '';
                 let tagInfo = CALENDAR_TAGS[tagKey] || null;
                 let isToday = (dateKey === todayStr);
-
                 let cell = document.createElement('div');
                 let baseBorderClass = tagInfo ? tagInfo.cellClass : "border-gray-200 bg-white hover:border-diary-blue/50";
                 let todayClass = isToday ? "border-2 border-diary-blue bg-blue-50/50 shadow-sm" : `border ${baseBorderClass}`;
                 let dayNumClass = isToday ? 'font-extrabold text-diary-blue text-xs' : 'font-bold text-gray-700';
-
-                cell.className = `h-14 rounded-xl p-1 flex flex-col justify-between transition overflow-hidden ${todayClass}`;
+                cell.className = `min-h-[52px] rounded-xl p-1 flex flex-col justify-between transition overflow-hidden ${todayClass}`;
                 cell.innerHTML = `
                     <div class="flex justify-between items-center px-0.5">
                         <span class="text-[10px] ${dayNumClass}">${day}</span>
@@ -1948,7 +1858,6 @@
             selectedCalTag = (selectedCalTag === tag) ? '' : tag;
             updateCalendarTagUI();
         }
-
         function updateCalendarTagUI() {
             document.querySelectorAll('.cal-tag-btn').forEach(btn => {
                 if (btn.getAttribute('data-cal-tag') === selectedCalTag) {
@@ -1958,7 +1867,6 @@
                 }
             });
         }
-
         function openCalendarDayModal(dateKey, event) {
             event.stopPropagation();
             selectedCalDateKey = dateKey;
@@ -1972,9 +1880,7 @@
             document.getElementById('calendar-modal').classList.remove('hidden');
             setTimeout(() => noteInput.focus(), 50);
         }
-
         function closeCalendarModal() { document.getElementById('calendar-modal').classList.add('hidden'); }
-
         function saveCalendarDayData() {
             let noteVal = document.getElementById('calendar-note-input').value.trim();
             let calData = JSON.parse(localStorage.getItem('diary_calendar_data')) || {};
@@ -2001,7 +1907,6 @@
                 return DEFAULT_TIMETABLE;
             }
         }
-
         function renderSmallSubjectBox(subj) {
             let text = (subj || '').trim();
             if (!text || text.toLowerCase() === 'trống') {
@@ -2009,29 +1914,24 @@
             }
             return `<div class="bg-cyan-100 text-cyan-800 p-1.5 rounded-lg font-medium h-[36px] flex flex-col justify-center"><span>${text}</span></div>`;
         }
-
         function renderTimetable() {
             const tbody = document.getElementById('timetable-tbody');
             const data = getTimetableData();
             tbody.innerHTML = '';
-
             const breaks = [
                 { afterSlot: 0, label: 'Ra chơi', cls: 'bg-cyan-50/40 text-cyan-800 text-[10px] p-1' },
                 { afterSlot: 1, label: 'Ăn trưa - Ngủ trưa', cls: 'bg-gray-50/60 text-gray-600 text-[10px] p-1.5' },
                 { afterSlot: 2, label: 'Ra chơi', cls: 'bg-cyan-50/40 text-cyan-800 text-[10px] p-1' }
             ];
-
             for (let slot = 0; slot < 4; slot++) {
                 let tr = document.createElement('tr');
                 tr.className = 'align-top';
                 let autoSlotTime = SLOT_TIME_MAP[slot] || '';
-
                 for (let day = 0; day < 5; day++) {
                     let cellInfo = (data[slot] && data[slot][day]) ? data[slot][day] : { type: 'single', name: 'Trống' };
                     let borderClass = day < 4 ? 'border-r border-gray-100' : '';
                     let td = document.createElement('td');
                     td.className = `p-1.5 ${borderClass}`;
-
                     if (cellInfo.type === 'split') {
                         td.classList.add('space-y-1');
                         td.innerHTML = `${renderSmallSubjectBox(cellInfo.top)}${renderSmallSubjectBox(cellInfo.bottom)}`;
@@ -2047,7 +1947,6 @@
                     tr.appendChild(td);
                 }
                 tbody.appendChild(tr);
-
                 let br = breaks.find(b => b.afterSlot === slot);
                 if (br) {
                     let brTr = document.createElement('tr');
@@ -2056,14 +1955,12 @@
                 }
             }
         }
-
         function setTimetableMode(mode) {
             currentTtMode = mode;
             const singleBtn = document.getElementById('tt-mode-single');
             const splitBtn = document.getElementById('tt-mode-split');
             const singleFields = document.getElementById('tt-single-fields');
             const splitFields = document.getElementById('tt-split-fields');
-
             if (mode === 'single') {
                 singleBtn.className = 'py-2 px-2.5 rounded-xl border border-[#53D2DC] bg-[#53D2DC]/15 text-diary-blue text-xs font-bold transition';
                 splitBtn.className = 'py-2 px-2.5 rounded-xl border border-gray-200 bg-white text-diary-text text-xs font-semibold transition';
@@ -2076,13 +1973,11 @@
                 singleFields.classList.add('hidden');
             }
         }
-
         function loadTimetableSlotEditor() {
             const day = parseInt(document.getElementById('tt-day-select').value, 10);
             const slot = parseInt(document.getElementById('tt-slot-select').value, 10);
             const data = getTimetableData();
             const cell = (data[slot] && data[slot][day]) ? data[slot][day] : { type: 'single', name: '' };
-
             if (cell.type === 'split') {
                 setTimetableMode('split');
                 document.getElementById('tt-split-top').value = cell.top || '';
@@ -2095,21 +1990,17 @@
                 document.getElementById('tt-split-bottom').value = '';
             }
         }
-
         function openTimetableModal() {
             loadTimetableSlotEditor();
             document.getElementById('timetable-modal').classList.remove('hidden');
         }
-
         function closeTimetableModal() {
             document.getElementById('timetable-modal').classList.add('hidden');
         }
-
         function saveTimetableSlot() {
             const day = parseInt(document.getElementById('tt-day-select').value, 10);
             const slot = parseInt(document.getElementById('tt-slot-select').value, 10);
             const data = getTimetableData();
-
             if (currentTtMode === 'single') {
                 data[slot][day] = {
                     type: 'single',
@@ -2122,13 +2013,11 @@
                     bottom: document.getElementById('tt-split-bottom').value.trim()
                 };
             }
-
             localStorage.setItem('diary_timetable_data', JSON.stringify(data));
             pushToCloudSync();
             closeTimetableModal();
             renderTimetable();
         }
-
         function showTimetableScreen() {
             mainScreen.classList.add('hidden');
             viewScreen.classList.add('hidden');
@@ -2139,7 +2028,7 @@
             timetableScreen.classList.remove('hidden');
             setActiveMenu('nav-timetable');
             renderTimetable();
-            resetScrollPositions([timetableScreen.querySelector('.max-h-\\[300px\\]')]);
+            resetScrollPositions([timetableScreen.querySelector('.overflow-y-auto')]);
         }
     </script>
 </body>
