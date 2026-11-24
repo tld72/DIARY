@@ -208,10 +208,10 @@
                     <p id="save-status" class="text-center text-xs text-diary-blue h-3 font-medium"></p>
                 </div>
 
-                <!-- 4. KHO TÀNG KÝ ỨC -->
+                <!-- 4. KHO TÀNG KÝ ỨC (DẠNG Ô NHỎ GỌN) -->
                 <div id="archive-screen" class="hidden space-y-3">
                     <div class="flex justify-between items-center border-b border-gray-100 pb-2 gap-2">
-                        <h2 class="text-sm font-semibold text-diary-blue">Kho tàng ký ức (Phân theo tuần)</h2>
+                        <h2 class="text-sm font-semibold text-diary-blue">Kho tàng ký ức</h2>
                         <button onclick="startDrawMemoryEffect()" class="px-3 py-1 bg-[#53D2DC]/15 text-diary-blue border border-[#53D2DC]/40 rounded-xl text-xs font-semibold hover:bg-[#53D2DC] hover:text-white transition shrink-0">
                             Gieo quẻ ký ức
                         </button>
@@ -222,7 +222,7 @@
                         </span>
                         <input type="text" id="archive-search-input" oninput="loadArchiveList()" onkeydown="handleArchiveSearchKey(event)" class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-diary-border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-diary-blue/30 text-diary-text">
                     </div>
-                    <div id="archive-list" class="space-y-4 max-h-[240px] sm:max-h-[280px] overflow-y-auto pr-1"></div>
+                    <div id="archive-list" class="space-y-3.5 max-h-[240px] sm:max-h-[280px] overflow-y-auto pr-1"></div>
                 </div>
 
                 <!-- 5. LỊCH NGỌT NGÀO -->
@@ -682,6 +682,7 @@
             localStorage.setItem(PRIVATE_UNLOCKED_FLAG, '1');
             updateLockButtonVisibility();
             refreshActiveViewsAfterSync();
+            pullFromCloudSync(false);
             goToMain();
         }
 
@@ -690,7 +691,7 @@
             localStorage.setItem(PRIVATE_VAULT_KEY, JSON.stringify(currentBundle));
             localStorage.setItem(PRIVATE_UNLOCKED_FLAG, '0');
 
-            // Làm sạch hoàn toàn dữ liệu hiển thị ở chế độ mới toanh (vẫn giữ mã PIN để mở khóa khi bấm đúp chữ tld)
+            // Làm sạch hoàn toàn dữ liệu hiển thị ở chế độ trống không (mỗi máy độc lập, không liên kết Drive)
             localStorage.removeItem('diary_entries');
             localStorage.removeItem('diary_calendar_data');
             localStorage.removeItem('diary_timetable_data');
@@ -803,8 +804,14 @@
             if (!musicScreen.classList.contains('hidden')) renderMusicList(true);
         }
 
+        // CHỈ ĐỒNG BỘ DRIVE KHI ĐANG Ở GIAO DIỆN PRIVATE (HOẶC CHƯA CÓ VAULT KHÓA)
         async function pullFromCloudSync(showManualFeedback = false) {
             if (!SCRIPT_URL || isSyncingFromCloud) return;
+            if (!isPrivateUnlocked()) {
+                if (showManualFeedback) setSyncBadge('Chế độ riêng tư cục bộ', 'text-gray-400');
+                else setSyncBadge('', 'text-gray-400');
+                return;
+            }
             isSyncingFromCloud = true;
             if (showManualFeedback) setSyncBadge('Đang đồng bộ...', 'text-diary-blue');
             try {
@@ -812,15 +819,9 @@
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 const json = await res.json();
                 if (json && json.ok && json.data && typeof json.data === 'object' && Object.keys(json.data).length > 0) {
-                    const isLockedFresh = Boolean(localStorage.getItem(PRIVATE_VAULT_KEY)) && !isPrivateUnlocked();
-                    if (isLockedFresh) {
-                        localStorage.setItem(PRIVATE_VAULT_KEY, JSON.stringify(json.data));
-                        setSyncBadge('Đã đồng bộ Drive', 'text-emerald-600');
-                    } else {
-                        applyBackupObjectToLocal(json.data);
-                        refreshActiveViewsAfterSync();
-                        setSyncBadge('Đã đồng bộ Drive', 'text-emerald-600');
-                    }
+                    applyBackupObjectToLocal(json.data);
+                    refreshActiveViewsAfterSync();
+                    setSyncBadge('Đã đồng bộ Drive', 'text-emerald-600');
                 } else {
                     setSyncBadge('Drive trống', 'text-gray-400');
                 }
@@ -832,7 +833,7 @@
         }
 
         function pushToCloudSync() {
-            if (!SCRIPT_URL) return;
+            if (!SCRIPT_URL || !isPrivateUnlocked()) return;
             setSyncBadge('Đang lưu Drive...', 'text-diary-blue');
             const payload = {
                 action: 'sync_save',
@@ -1318,6 +1319,9 @@
             let savedPass = localStorage.getItem('diary_password');
             if (!savedPass) {
                 localStorage.setItem('diary_password', enteredPin);
+                if (!localStorage.getItem(PRIVATE_VAULT_KEY)) {
+                    localStorage.setItem(PRIVATE_UNLOCKED_FLAG, '1');
+                }
                 pushToCloudSync();
                 goToMain();
             } else {
@@ -1385,6 +1389,30 @@
             weekDates.forEach(date => renderDiaryItem(date, entries[date], diaryList));
         }
 
+        // KHO TÀNG KÝ ỨC: MỖI BÀI LÀ MỘT Ô NHỎ GỌN, BẤM VÀO ĐỂ MỞ ĐỌC
+        function renderArchiveTile(date, entryData, container) {
+            let moodIcon = (typeof entryData === 'object' && entryData !== null && entryData.mood) ? entryData.mood : '📄';
+            let hasMusic = (typeof entryData === 'object' && entryData.spotify) ? ' 🎵' : '';
+            let content = (typeof entryData === 'object' && entryData !== null) ? (entryData.content || '') : (entryData || '');
+            let dateObj = new Date(date + 'T00:00:00');
+            let shortDate = dateObj.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+            let weekdayLabel = dateObj.toLocaleDateString('vi-VN', { weekday: 'short' });
+            let excerpt = content.trim() ? content.trim().replace(/\s+/g, ' ') : 'Chưa có nội dung';
+
+            let tile = document.createElement('button');
+            tile.type = 'button';
+            tile.onclick = () => openView(date, false);
+            tile.className = 'w-full text-left p-2.5 bg-gray-50 hover:bg-cyan-50/70 border border-gray-200 hover:border-[#53D2DC] rounded-xl transition flex flex-col justify-between gap-1 group';
+            tile.innerHTML = `
+                <div class="flex items-center justify-between gap-1">
+                    <span class="text-xs font-bold text-diary-blue group-hover:text-[#0056A3] truncate">${shortDate} · ${weekdayLabel}</span>
+                    <span class="text-sm shrink-0">${moodIcon}${hasMusic}</span>
+                </div>
+                <p class="text-[11px] text-gray-500 line-clamp-2 leading-snug">${excerpt}</p>
+            `;
+            container.appendChild(tile);
+        }
+
         function loadArchiveList() {
             archiveList.innerHTML = '';
             let entries = JSON.parse(localStorage.getItem('diary_entries')) || {};
@@ -1411,18 +1439,18 @@
                 let monday = new Date(new Date(d).setDate(diffToMonday));
                 let sunday = new Date(monday);
                 sunday.setDate(monday.getDate() + 6);
-                let weekKey = `${monday.toLocaleDateString('vi-VN')} đến ${sunday.toLocaleDateString('vi-VN')}`;
+                let weekKey = `${monday.toLocaleDateString('vi-VN')} - ${sunday.toLocaleDateString('vi-VN')}`;
                 if (!weeksMap[weekKey]) weeksMap[weekKey] = [];
                 weeksMap[weekKey].push(date);
             });
             Object.keys(weeksMap).forEach(weekKey => {
                 let groupDiv = document.createElement('div');
-                groupDiv.className = "space-y-1.5";
-                groupDiv.innerHTML = `<div class="text-xs font-bold text-diary-blue bg-blue-50 px-3 py-1 rounded-lg">Tuần: ${weekKey}</div>`;
-                let itemsContainer = document.createElement('div');
-                itemsContainer.className = "space-y-2 pl-2";
-                weeksMap[weekKey].forEach(date => renderDiaryItem(date, entries[date], itemsContainer));
-                groupDiv.appendChild(itemsContainer);
+                groupDiv.className = 'space-y-1.5';
+                groupDiv.innerHTML = `<div class="text-[11px] font-bold text-diary-blue bg-blue-50/80 px-2.5 py-1 rounded-lg">${weekKey}</div>`;
+                let gridContainer = document.createElement('div');
+                gridContainer.className = 'grid grid-cols-2 sm:grid-cols-3 gap-2';
+                weeksMap[weekKey].forEach(date => renderArchiveTile(date, entries[date], gridContainer));
+                groupDiv.appendChild(gridContainer);
                 archiveList.appendChild(groupDiv);
             });
         }
