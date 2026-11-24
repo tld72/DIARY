@@ -495,18 +495,14 @@
         </div>
     </div>
 
-    <!-- MODAL PIN -->
-    <div id="auth-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+    <!-- MODAL PIN (KHÔNG CÓ NÚT HỦY VÀ XÁC NHẬN) -->
+    <div id="auth-modal" onclick="if(event.target===this) closeAuthModal()" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4 shadow-xl border border-gray-100 text-center">
-            <h3 id="auth-modal-title" class="text-sm font-semibold text-diary-text">Xác nhận mã PIN để tiếp tục</h3>
+            <h3 id="auth-modal-title" class="text-sm font-semibold text-diary-text">Nhập mã PIN</h3>
             <div class="flex justify-center space-x-3">
                 <input type="password" maxlength="1" class="auth-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveAuthNext(this, 1)">
                 <input type="password" maxlength="1" class="auth-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveAuthNext(this, 2)">
                 <input type="password" maxlength="1" class="auth-pin w-12 h-12 text-center text-xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveAuthNext(this, 3)">
-            </div>
-            <div class="flex space-x-3 pt-2">
-                <button onclick="closeAuthModal()" class="w-1/2 bg-gray-100 text-diary-text py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition text-sm">Hủy</button>
-                <button onclick="verifyAuthAction()" class="w-1/2 bg-diary-blue text-white py-2.5 rounded-xl font-semibold hover:bg-blue-900 transition shadow-sm text-sm">Xác nhận</button>
             </div>
             <p id="auth-status" class="text-center text-xs text-red-500 h-4 font-medium"></p>
         </div>
@@ -804,7 +800,7 @@
             if (!musicScreen.classList.contains('hidden')) renderMusicList(true);
         }
 
-        // CHỈ ĐỒNG BỘ DRIVE KHI ĐANG Ở GIAO DIỆN PRIVATE (HOẶC CHƯA CÓ VAULT KHÓA)
+        // CHỈ ĐỒNG BỘ DRIVE KHI ĐANG Ở GIAO DIỆN PRIVATE
         async function pullFromCloudSync(showManualFeedback = false) {
             if (!SCRIPT_URL || isSyncingFromCloud) return;
             if (!isPrivateUnlocked()) {
@@ -1389,27 +1385,75 @@
             weekDates.forEach(date => renderDiaryItem(date, entries[date], diaryList));
         }
 
-        // KHO TÀNG KÝ ỨC: MỖI BÀI LÀ MỘT Ô NHỎ GỌN, BẤM VÀO ĐỂ MỞ ĐỌC
+        // KHO TÀNG KÝ ỨC: CHỈ HIỆN NGÀY VÀ EMOJI MẶT, NHẤN GIỮ ĐỂ HIỆN NÚT XÓA
         function renderArchiveTile(date, entryData, container) {
-            let moodIcon = (typeof entryData === 'object' && entryData !== null && entryData.mood) ? entryData.mood : '📄';
-            let hasMusic = (typeof entryData === 'object' && entryData.spotify) ? ' 🎵' : '';
-            let content = (typeof entryData === 'object' && entryData !== null) ? (entryData.content || '') : (entryData || '');
+            let moodIcon = (typeof entryData === 'object' && entryData !== null && entryData.mood) ? entryData.mood : '🙂';
             let dateObj = new Date(date + 'T00:00:00');
             let shortDate = dateObj.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
-            let weekdayLabel = dateObj.toLocaleDateString('vi-VN', { weekday: 'short' });
-            let excerpt = content.trim() ? content.trim().replace(/\s+/g, ' ') : 'Chưa có nội dung';
 
-            let tile = document.createElement('button');
-            tile.type = 'button';
-            tile.onclick = () => openView(date, false);
-            tile.className = 'w-full text-left p-2.5 bg-gray-50 hover:bg-cyan-50/70 border border-gray-200 hover:border-[#53D2DC] rounded-xl transition flex flex-col justify-between gap-1 group';
-            tile.innerHTML = `
-                <div class="flex items-center justify-between gap-1">
-                    <span class="text-xs font-bold text-diary-blue group-hover:text-[#0056A3] truncate">${shortDate} · ${weekdayLabel}</span>
-                    <span class="text-sm shrink-0">${moodIcon}${hasMusic}</span>
-                </div>
-                <p class="text-[11px] text-gray-500 line-clamp-2 leading-snug">${excerpt}</p>
+            let tile = document.createElement('div');
+            tile.className = 'relative select-none';
+
+            let btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'w-full p-2.5 bg-gray-50 hover:bg-cyan-50/70 border border-gray-200 hover:border-[#53D2DC] rounded-xl transition flex items-center justify-between gap-2';
+            btn.innerHTML = `
+                <span class="text-xs font-bold text-diary-blue truncate">${shortDate}</span>
+                <span class="text-base shrink-0">${moodIcon}</span>
             `;
+
+            let delBtn = document.createElement('button');
+            delBtn.type = 'button';
+            delBtn.className = 'hidden absolute inset-0 w-full h-full bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center justify-center z-10';
+            delBtn.innerText = 'Xóa';
+            delBtn.onclick = (e) => {
+                e.stopPropagation();
+                executeDelete(date);
+            };
+
+            let longPressTimer = null;
+            let longPressTriggered = false;
+
+            const startPress = () => {
+                longPressTriggered = false;
+                clearTimeout(longPressTimer);
+                longPressTimer = setTimeout(() => {
+                    longPressTriggered = true;
+                    document.querySelectorAll('.archive-delete-overlay').forEach(el => el.classList.add('hidden'));
+                    delBtn.classList.remove('hidden');
+                }, 480);
+            };
+
+            const cancelPress = () => {
+                clearTimeout(longPressTimer);
+            };
+
+            delBtn.classList.add('archive-delete-overlay');
+
+            btn.addEventListener('pointerdown', startPress);
+            btn.addEventListener('pointerup', cancelPress);
+            btn.addEventListener('pointerleave', cancelPress);
+            btn.addEventListener('pointercancel', cancelPress);
+            btn.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                longPressTriggered = true;
+                document.querySelectorAll('.archive-delete-overlay').forEach(el => el.classList.add('hidden'));
+                delBtn.classList.remove('hidden');
+            });
+            btn.addEventListener('click', () => {
+                if (longPressTriggered) {
+                    longPressTriggered = false;
+                    return;
+                }
+                if (!delBtn.classList.contains('hidden')) {
+                    delBtn.classList.add('hidden');
+                    return;
+                }
+                openView(date, false);
+            });
+
+            tile.appendChild(btn);
+            tile.appendChild(delBtn);
             container.appendChild(tile);
         }
 
@@ -1477,7 +1521,7 @@
                 <div class="space-x-1 text-xs flex items-center shrink-0">
                     <button onclick="openView('${date}', false)" class="px-2.5 py-1 bg-diary-blue/10 text-diary-blue font-medium rounded-lg hover:bg-diary-blue/20 transition">Xem</button>
                     ${editButtonHtml}
-                    <button onclick="requestDelete('${date}')" class="px-2.5 py-1 bg-red-50 text-red-500 font-medium rounded-lg hover:bg-red-100 transition">Xóa</button>
+                    <button onclick="executeDelete('${date}')" class="px-2.5 py-1 bg-red-50 text-red-500 font-medium rounded-lg hover:bg-red-100 transition">Xóa</button>
                 </div>
             `;
             container.appendChild(div);
@@ -1675,9 +1719,8 @@
             }
             pendingAction = 'edit';
             pendingDate = date;
-            showAuthModal('Nhập mã PIN để chỉnh sửa bài nhật ký');
+            showAuthModal('Nhập mã PIN');
         }
-        function requestDelete(date) { pendingAction = 'delete'; pendingDate = date; showAuthModal('Nhập mã PIN để xóa bài nhật ký'); }
 
         function showAuthModal(title) {
             document.getElementById('auth-modal-title').innerText = title;
@@ -1713,7 +1756,6 @@
                     viewScreen.classList.add('hidden');
                     openEdit(dateToProcess);
                 }
-                else if (action === 'delete') { executeDelete(dateToProcess); }
             } else {
                 statusEl.innerText = 'Mã PIN không đúng!';
                 clearPins('.auth-pin');
@@ -1796,7 +1838,9 @@
                 pushToCloudSync();
                 loadCurrentWeekDiary();
                 loadArchiveList();
-                goToMain();
+                if (!viewScreen.classList.contains('hidden') && currentActiveDate === date) {
+                    closeViewScreen();
+                }
             }
         }
 
