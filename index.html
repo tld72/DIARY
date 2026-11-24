@@ -106,7 +106,7 @@
 
     <!-- 1. MÀN HÌNH KHÓA -->
     <div id="lock-screen" class="hidden w-full max-w-sm sm:max-w-xl bg-white rounded-2xl sm:rounded-3xl shadow-xl p-5 sm:p-10 space-y-5 border border-gray-100 text-center mx-3">
-        <h1 class="text-3xl sm:text-4xl font-bold text-[#53D2DC] tracking-wide">tld</h1>
+        <h1 class="text-3xl sm:text-4xl font-bold text-[#53D2DC] tracking-wide select-none">tld</h1>
         <p id="lock-message" class="text-diary-text text-sm sm:text-base font-medium">Nhập mã PIN</p>
         <div class="flex justify-center space-x-2.5 sm:space-x-3">
             <input type="password" maxlength="1" class="pin-box w-12 h-12 sm:w-14 sm:h-14 text-center text-xl sm:text-2xl font-bold bg-gray-50 border border-diary-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#53D2DC]/30 text-diary-text" oninput="moveToNext(this, 1)" onkeydown="handlePinKey(event, 0)">
@@ -122,7 +122,7 @@
             <div class="md:col-span-2 space-y-3.5">
                 <div class="flex justify-between items-center pb-2 border-b border-gray-100">
                     <div class="flex items-center space-x-2.5">
-                        <h1 onclick="goToMain()" class="text-2xl font-bold text-[#53D2DC] tracking-wide cursor-pointer hover:opacity-80 transition">tld</h1>
+                        <h1 id="brand-tld-header" onclick="handleSingleTldClick()" ondblclick="triggerPrivateUnlockPrompt()" class="text-2xl font-bold text-[#53D2DC] tracking-wide cursor-pointer hover:opacity-80 transition select-none">tld</h1>
                         <span id="sync-status-badge" onclick="pullFromCloudSync(true)" class="text-[11px] text-gray-400 cursor-pointer hover:text-diary-blue transition" title="Bấm để tải lại dữ liệu từ Drive"></span>
                     </div>
                     <span id="entry-count-badge" class="text-xs bg-diary-blue/10 text-diary-blue px-3 py-1 rounded-full font-medium"></span>
@@ -319,6 +319,9 @@
                                 Nhập dữ liệu
                             </button>
                         </div>
+                        <button type="button" id="lock-private-btn" onclick="lockIntoFreshMode()" class="hidden w-full text-left px-3.5 py-2.5 bg-white border border-rose-200 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 hover:border-rose-300 transition flex items-center justify-between">
+                            <span>Khóa lại</span>
+                        </button>
                         <input type="file" id="backup-file-input" accept=".json,application/json" onchange="handleImportBackupFile(event)" class="hidden">
                     </div>
                 </div>
@@ -519,6 +522,8 @@
             'diary_timetable_data',
             'diary_auto_song_titles'
         ];
+        const PRIVATE_VAULT_KEY = 'diary_private_vault';
+        const PRIVATE_UNLOCKED_FLAG = 'diary_private_unlocked';
         const splashScreen = document.getElementById('splash-screen');
         const lockScreen = document.getElementById('lock-screen');
         const appContainer = document.getElementById('app-container');
@@ -547,6 +552,7 @@
         const entryCountBadge = document.getElementById('entry-count-badge');
         const dailyQuoteEl = document.getElementById('daily-quote');
         const syncStatusBadge = document.getElementById('sync-status-badge');
+        const lockPrivateBtn = document.getElementById('lock-private-btn');
         
         let currentActiveDate = null;
         let selectedMood = null;
@@ -557,6 +563,7 @@
         let previousScreen = 'main-screen';
         let isDrawingMemory = false;
         let isSyncingFromCloud = false;
+        let singleClickTimeout = null;
 
         // TRẠNG THÁI PHÁT NHẠC LIÊN TỤC
         let currentMusicItems = [];
@@ -627,19 +634,101 @@
             '"Niềm tin vào bản thân là chìa khóa mở mọi cánh cửa thành công."'
         ];
 
-        // TẠO ICON MÀN HÌNH CHÍNH IOS / ANDROID CÓ NỀN TRẮNG THAY VÌ NỀN ĐEN
+        // QUẢN LÝ TRẠNG THÁI PRIVATE & NÚT "KHÓA LẠI"
+        function isPrivateUnlocked() {
+            return localStorage.getItem(PRIVATE_UNLOCKED_FLAG) === '1';
+        }
+
+        function updateLockButtonVisibility() {
+            if (!lockPrivateBtn) return;
+            if (isPrivateUnlocked()) {
+                lockPrivateBtn.classList.remove('hidden');
+            } else {
+                lockPrivateBtn.classList.add('hidden');
+            }
+        }
+
+        function handleSingleTldClick() {
+            if (singleClickTimeout) clearTimeout(singleClickTimeout);
+            singleClickTimeout = setTimeout(() => {
+                singleClickTimeout = null;
+                goToMain();
+            }, 220);
+        }
+
+        function triggerPrivateUnlockPrompt() {
+            if (singleClickTimeout) {
+                clearTimeout(singleClickTimeout);
+                singleClickTimeout = null;
+            }
+            const hasVault = Boolean(localStorage.getItem(PRIVATE_VAULT_KEY));
+            if (!hasVault && isPrivateUnlocked()) {
+                goToMain();
+                return;
+            }
+            pendingAction = 'unlock_private';
+            pendingDate = null;
+            showAuthModal('Nhập mã PIN');
+        }
+
+        function unlockPrivateVaultData() {
+            const rawVault = localStorage.getItem(PRIVATE_VAULT_KEY);
+            if (rawVault) {
+                try {
+                    const parsedVault = JSON.parse(rawVault);
+                    applyBackupObjectToLocal(parsedVault);
+                } catch (e) {}
+            }
+            localStorage.setItem(PRIVATE_UNLOCKED_FLAG, '1');
+            updateLockButtonVisibility();
+            refreshActiveViewsAfterSync();
+            goToMain();
+        }
+
+        function lockIntoFreshMode() {
+            const currentBundle = collectLocalBackupObject();
+            localStorage.setItem(PRIVATE_VAULT_KEY, JSON.stringify(currentBundle));
+            localStorage.setItem(PRIVATE_UNLOCKED_FLAG, '0');
+
+            // Làm sạch hoàn toàn dữ liệu hiển thị ở chế độ mới toanh (vẫn giữ mã PIN để mở khóa khi bấm đúp chữ tld)
+            localStorage.removeItem('diary_entries');
+            localStorage.removeItem('diary_calendar_data');
+            localStorage.removeItem('diary_timetable_data');
+            localStorage.removeItem('diary_auto_song_titles');
+
+            updateLockButtonVisibility();
+            refreshActiveViewsAfterSync();
+            goToMain();
+        }
+
+        // TẠO ICON MÀN HÌNH CHÍNH IOS / ANDROID CÓ NỀN TRẮNG + DỰ PHÒNG CHỐNG LỖI CORS
         function applyWhiteBackgroundHomeIcon() {
             const appleIconLink = document.getElementById('apple-home-icon');
             if (!appleIconLink) return;
+
+            const size = 180;
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            function drawFallbackWhiteIcon() {
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, size, size);
+                ctx.fillStyle = '#53D2DC';
+                ctx.font = 'bold 54px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('tld', size / 2, size / 2);
+                appleIconLink.href = canvas.toDataURL('image/png');
+            }
+
+            drawFallbackWhiteIcon();
+
             const img = new Image();
             img.crossOrigin = 'anonymous';
             img.onload = function() {
                 try {
-                    const size = 180;
-                    const canvas = document.createElement('canvas');
-                    canvas.width = size;
-                    canvas.height = size;
-                    const ctx = canvas.getContext('2d');
                     ctx.fillStyle = '#FFFFFF';
                     ctx.fillRect(0, 0, size, size);
 
@@ -654,8 +743,11 @@
                     ctx.drawImage(img, drawX, drawY, drawW, drawH);
 
                     appleIconLink.href = canvas.toDataURL('image/png');
-                } catch (e) {}
+                } catch (e) {
+                    drawFallbackWhiteIcon();
+                }
             };
+            img.onerror = drawFallbackWhiteIcon;
             img.src = APP_LOGO_URL;
         }
 
@@ -720,9 +812,15 @@
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 const json = await res.json();
                 if (json && json.ok && json.data && typeof json.data === 'object' && Object.keys(json.data).length > 0) {
-                    applyBackupObjectToLocal(json.data);
-                    refreshActiveViewsAfterSync();
-                    setSyncBadge('Đã đồng bộ Drive', 'text-emerald-600');
+                    const isLockedFresh = Boolean(localStorage.getItem(PRIVATE_VAULT_KEY)) && !isPrivateUnlocked();
+                    if (isLockedFresh) {
+                        localStorage.setItem(PRIVATE_VAULT_KEY, JSON.stringify(json.data));
+                        setSyncBadge('Đã đồng bộ Drive', 'text-emerald-600');
+                    } else {
+                        applyBackupObjectToLocal(json.data);
+                        refreshActiveViewsAfterSync();
+                        setSyncBadge('Đã đồng bộ Drive', 'text-emerald-600');
+                    }
                 } else {
                     setSyncBadge('Drive trống', 'text-gray-400');
                 }
@@ -757,6 +855,7 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             applyWhiteBackgroundHomeIcon();
+            updateLockButtonVisibility();
             pullFromCloudSync(false);
             setTimeout(() => {
                 splashScreen.classList.add('opacity-0');
@@ -875,6 +974,9 @@
                         alert('Không tìm thấy dữ liệu của tld trong file này.');
                         return;
                     }
+                    localStorage.setItem(PRIVATE_UNLOCKED_FLAG, '1');
+                    localStorage.removeItem(PRIVATE_VAULT_KEY);
+                    updateLockButtonVisibility();
                     pushToCloudSync();
                     alert('Đã nhập dữ liệu thành công và đồng bộ lên Drive! Trang sẽ tải lại để cập nhật.');
                     window.location.reload();
@@ -1219,8 +1321,15 @@
                 pushToCloudSync();
                 goToMain();
             } else {
-                if (enteredPin === savedPass) goToMain();
-                else {
+                if (enteredPin === savedPass) {
+                    const hasVault = Boolean(localStorage.getItem(PRIVATE_VAULT_KEY));
+                    if (hasVault && !isPrivateUnlocked()) {
+                        goToMain();
+                    } else {
+                        localStorage.setItem(PRIVATE_UNLOCKED_FLAG, '1');
+                        goToMain();
+                    }
+                } else {
                     alert('Mã PIN không đúng!');
                     clearPins('.pin-box');
                     document.querySelectorAll('.pin-box')[0].focus();
@@ -1240,6 +1349,7 @@
             mainScreen.classList.remove('hidden');
             previousScreen = 'main-screen';
             setActiveMenu(null);
+            updateLockButtonVisibility();
             getRandomQuote();
             loadCurrentWeekDiary();
             resetScrollPositions([diaryList]);
@@ -1560,11 +1670,14 @@
             let savedPass = localStorage.getItem('diary_password');
             let statusEl = document.getElementById('auth-status');
             if (enteredPin.length < 3) { statusEl.innerText = 'Vui lòng nhập đủ 3 số!'; return; }
-            if (enteredPin === savedPass) {
+            if (!savedPass || enteredPin === savedPass) {
+                if (!savedPass) localStorage.setItem('diary_password', enteredPin);
                 let action = pendingAction;
                 let dateToProcess = pendingDate;
                 closeAuthModal();
-                if (action === 'edit') {
+                if (action === 'unlock_private') {
+                    unlockPrivateVaultData();
+                } else if (action === 'edit') {
                     if (isEntryExpiredForEdit(dateToProcess)) {
                         alert('Bài nhật ký này đã quá 7 ngày nên không thể chỉnh sửa nữa.');
                         return;
