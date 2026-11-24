@@ -560,6 +560,7 @@
         let isDrawingMemory = false;
         let isSyncingFromCloud = false;
         let singleClickTimeout = null;
+        let justOpenedDeleteOverlayAt = 0;
 
         // TRẠNG THÁI PHÁT NHẠC LIÊN TỤC
         let currentMusicItems = [];
@@ -629,6 +630,17 @@
             '"Hãy tử tế với chính mình, bạn đang làm rất tốt rồi!"',
             '"Niềm tin vào bản thân là chìa khóa mở mọi cánh cửa thành công."'
         ];
+
+        // BẤM BẤT KÌ CHỖ NÀO TRÊN MÀN HÌNH SẼ THOÁT CHẾ ĐỘ XÓA
+        function hideAllArchiveDeleteOverlays() {
+            document.querySelectorAll('.archive-delete-overlay').forEach(el => el.classList.add('hidden'));
+        }
+
+        document.addEventListener('pointerdown', (e) => {
+            if (Date.now() - justOpenedDeleteOverlayAt < 120) return;
+            if (e.target.closest('.archive-delete-overlay')) return;
+            hideAllArchiveDeleteOverlays();
+        }, true);
 
         // QUẢN LÝ TRẠNG THÁI PRIVATE & NÚT "KHÓA LẠI"
         function isPrivateUnlocked() {
@@ -1404,7 +1416,7 @@
 
             let delBtn = document.createElement('button');
             delBtn.type = 'button';
-            delBtn.className = 'hidden absolute inset-0 w-full h-full bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center justify-center z-10';
+            delBtn.className = 'archive-delete-overlay hidden absolute inset-0 w-full h-full bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center justify-center z-10';
             delBtn.innerText = 'Xóa';
             delBtn.onclick = (e) => {
                 e.stopPropagation();
@@ -1414,21 +1426,22 @@
             let longPressTimer = null;
             let longPressTriggered = false;
 
+            const showDeleteOverlay = () => {
+                longPressTriggered = true;
+                justOpenedDeleteOverlayAt = Date.now();
+                hideAllArchiveDeleteOverlays();
+                delBtn.classList.remove('hidden');
+            };
+
             const startPress = () => {
                 longPressTriggered = false;
                 clearTimeout(longPressTimer);
-                longPressTimer = setTimeout(() => {
-                    longPressTriggered = true;
-                    document.querySelectorAll('.archive-delete-overlay').forEach(el => el.classList.add('hidden'));
-                    delBtn.classList.remove('hidden');
-                }, 480);
+                longPressTimer = setTimeout(showDeleteOverlay, 480);
             };
 
             const cancelPress = () => {
                 clearTimeout(longPressTimer);
             };
-
-            delBtn.classList.add('archive-delete-overlay');
 
             btn.addEventListener('pointerdown', startPress);
             btn.addEventListener('pointerup', cancelPress);
@@ -1436,9 +1449,7 @@
             btn.addEventListener('pointercancel', cancelPress);
             btn.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
-                longPressTriggered = true;
-                document.querySelectorAll('.archive-delete-overlay').forEach(el => el.classList.add('hidden'));
-                delBtn.classList.remove('hidden');
+                showDeleteOverlay();
             });
             btn.addEventListener('click', () => {
                 if (longPressTriggered) {
